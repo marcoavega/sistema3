@@ -23,9 +23,11 @@
    <!-- cambia dinámicamente -->
     <link id="tabulator-theme" rel="stylesheet" href="<?php echo BASE_URL; ?>assets/tabulator-6.3/dist/css/tabulator.min.css">
 
-
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>assets/css/general-style.css">
     <!-- Enlace a la hoja de estilos personalizada de la aplicación (style.css) -->
+
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>assets/css/navbar-style.css">
+    <!-- Enlace a la hoja de estilos personalizada del navbar -->
 
     <script>
         var BASE_URL = "<?php echo BASE_URL; ?>";
