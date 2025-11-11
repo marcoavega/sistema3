@@ -1,0 +1,47 @@
+.form-control:focus, .form-select:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+  }
+  
+  .card {
+    transition: transform 0.2s ease-in-out;
+  }
+  
+  .card:hover {
+    transform: translateY(-2px);
+  }
+  
+  .input-group-text {
+    border: 1px solid #dee2e6;
+  }
+  
+  .form-control.border-start-0 {
+    border-left: none !important;
+  }
+  
+  .input-group-text.border-end-0 {
+    border-right: none !important;
+  }
+  
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .modal.show .modal-dialog {
+    animation: fadeInUp 0.3s ease-out;
+  }
+  
+  .btn {
+    transition: all 0.2s ease-in-out;
+  }
+  
+  .btn:hover {
+    transform: translateY(-1px);
+  }

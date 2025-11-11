@@ -4,297 +4,32 @@
    y rellenos predeterminados, además de manejar la altura y el scroll.
    =================================================================== */
 
-html,
-body {
-  margin: 0; /* Elimina los márgenes predeterminados del navegador */
-  padding: 0; /* Elimina el relleno interno predeterminado */
-  height: 100%; /* Establece altura completa para html y body */
-  overflow-x: hidden; /* Oculta el scroll horizontal */
+   html, body {
+    /* Elimina los márgenes predeterminados del navegador */
+    margin: 0;
+
+    /* Elimina el relleno interno predeterminado en el cuerpo de la página */
+    padding: 0;
+
+    /* Establece la altura del `html` y `body` al 100% del tamaño del viewport */
+    /* Esto permite que elementos dentro del `body` ocupen toda la pantalla */
+    height: 100%;
+
+    /* Oculta la barra de desplazamiento horizontal */
+    /* Esto evita problemas con elementos que sobresalen del ancho de la ventana */
+    overflow-x: hidden;
 }
 
-/*--------------------------------Estilos de navbar---------------------------------------*/
-
-.navbar-modern {
-  backdrop-filter: blur(10px); /* Aplica efecto de desenfoque al fondo */
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Borde inferior sutil */
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); /* Sombra para profundidad */
-}
-.navbar-brand-modern:hover {
-  transform: scale(1.05); /* Aumenta tamaño al pasar el mouse */
-  filter: brightness(1.2); /* Aumenta brillo al pasar el mouse */
-}
-.nav-link-modern {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* Transición suave */
-  border-radius: 12px; /* Bordes redondeados */
-  padding: 0.75rem 1rem !important; /* Espacio interno con prioridad */
-  margin: 0 0.25rem; /* Margen horizontal */
-  position: relative; /* Posicionamiento para pseudoelementos */
-  overflow: hidden; /* Oculta contenido que sobresale */
-}
-.nav-link-modern::before {
-  content: ""; /* Pseudoelemento vacío para efecto */
-  position: absolute; /* Posicionamiento absoluto */
-  top: 0; /* Arriba */
-  left: -100%; /* Fuera del área visible a la izquierda */
-  width: 100%; /* Ancho total del enlace */
-  height: 100%; /* Alto total del enlace */
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.2),
-    transparent
-  ); /* Gradiente para efecto de brillo */
-  transition: left 0.5s; /* Transición del brillo */
-}
-.nav-link-modern:hover::before {
-  left: 100%; /* Mueve el brillo a la derecha */
-}
-.nav-link-modern:hover {
-  background: rgba(255, 255, 255, 0.1); /* Fondo claro al hacer hover */
-  transform: translateY(-2px); /* Sube ligeramente el enlace */
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Sombra suave */
-}
-.nav-link-modern.active {
-  background: rgba(255, 255, 255, 0.2) !important; /* Fondo activo */
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Sombra más marcada */
-  transform: translateY(-1px); /* Subida leve */
-}
-.nav-link-modern.active::after {
-  content: ""; /* Línea decorativa */
-  position: absolute; /* Posicionamiento absoluto */
-  bottom: 0; /* Abajo */
-  left: 50%; /* Centrado horizontal */
-  transform: translateX(-50%); /* Centrado exacto */
-  width: 30px; /* Ancho de la línea */
-  height: 3px; /* Alto de la línea */
-  background: #000000; /* Color negro */
-  border-radius: 2px; /* Bordes redondeados */
-}
-.nav-icon {
-  font-size: 1.2rem; /* Tamaño del icono */
-  margin-bottom: 0.25rem; /* Espacio inferior */
-  transition: transform 0.3s ease; /* Transición para escalado */
-}
-.nav-link-modern:hover .nav-icon {
-  transform: scale(1.1); /* Escala icono en hover */
-}
-.btn-theme-toggle {
-  background: rgba(255, 255, 255, 0.1); /* Fondo semitransparente */
-  border: 1px solid rgba(255, 255, 255, 0.2); /* Borde translúcido */
-  border-radius: 50%; /* Botón circular */
-  width: 45px; /* Ancho fijo */
-  height: 45px; /* Alto fijo */
-  display: flex; /* Flexbox para centrar contenido */
-  align-items: center; /* Centrado vertical */
-  justify-content: center; /* Centrado horizontal */
-  transition: all 0.3s ease; /* Transición suave */
-}
-.btn-theme-toggle:hover {
-  background: rgba(0, 0, 0, 0.2); /* Fondo oscuro en hover */
-  transform: rotate(180deg) scale(1.1); /* Rotación y escalado */
-  border-color: rgba(0, 0, 0, 0.3); /* Borde oscuro */
-  border: 1px solid rgba(255, 255, 255, 0.2); /* Borde translúcido */
-  border-radius: 50%; /* Botón circular */
-  width: 45px; /* Ancho fijo */
-  height: 45px; /* Alto fijo */
-  display: flex; /* Flexbox */
-  align-items: center; /* Centrado vertical */
-  justify-content: center; /* Centrado horizontal */
-  transition: all 0.3s ease; /* Transición */
-}
-.btn-options {
-  background: rgba(0, 0, 0, 0.1); /* Fondo oscuro translúcido */
-  border: 1px solid rgba(255, 255, 255, 0.2); /* Borde translúcido */
-  border-radius: 12px; /* Bordes redondeados */
-  padding: 0.5rem 1rem; /* Relleno interno */
-  transition: all 0.3s ease; /* Transición */
-}
-.btn-options:hover {
-  background: rgba(0, 0, 0, 0.2); /* Fondo más oscuro */
-  color: #000; /* Texto negro */
-  transform: translateY(-2px); /* Sube el botón */
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Sombra */
-}
-.dropdown-menu-modern {
-  backdrop-filter: blur(10px); /* Fondo desenfocado */
-  border: 1px solid rgba(255, 255, 255, 0.2); /* Borde translúcido */
-  border-radius: 15px; /* Bordes redondeados */
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1); /* Sombra */
-  padding: 0.75rem 0; /* Relleno vertical */
-  margin-top: 0.5rem; /* Margen superior */
-}
-.dropdown-item-modern {
-  padding: 0.75rem 1.5rem; /* Relleno */
-  transition: all 0.3s ease; /* Transición */
-  border-radius: 0; /* Sin bordes redondeados */
-  display: flex; /* Elementos alineados horizontalmente */
-  align-items: center; /* Centrado vertical */
-}
-.dropdown-item-modern:hover {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); /* Gradiente en hover */
-  color: #fff; /* Texto blanco */
-  transform: translateX(5px); /* Desplazamiento a la derecha */
-}
-.user-avatar {
-  width: 35px; /* Ancho del avatar */
-  height: 35px; /* Alto del avatar */
-  border-radius: 50%; /* Forma circular */
-  object-fit: cover; /* Ajusta imagen manteniendo proporciones */
-  border: 2px solid rgba(255, 255, 255, 0.3); /* Borde translúcido */
-  transition: all 0.3s ease; /* Transición suave */
-}
-.user-avatar:hover {
-  transform: scale(1.1); /* Escala en hover */
-  border-color: #fff; /* Cambia borde a blanco */
-}
-.navbar-toggler-modern {
-  border: none; /* Sin borde */
-  padding: 0.5rem; /* Relleno */
-  border-radius: 8px; /* Bordes redondeados */
-  background: rgba(255, 255, 255, 0.1); /* Fondo translúcido */
-}
-.navbar-toggler-modern:focus {
-  box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.25); /* Sombra al enfocar */
-}
-@keyframes pulse {
-  0% {
-    transform: scale(1); /* Escala normal */
-  }
-  50% {
-    transform: scale(1.1); /* Escala aumentada */
-  }
-  100% {
-    transform: scale(1); /* Escala normal */
-  }
-}
-@media (max-width: 991.98px) {
-  .nav-link-modern {
-    text-align: center; /* Texto centrado en móviles */
-    margin: 0.25rem 0; /* Márgenes verticales */
-  }
-  .search-container {
-    max-width: none; /* Sin límite de ancho */
-    margin: 1rem 0; /* Margen vertical */
-  }
+.style-first-div-login{
+    min-height: 100vh;
 }
 
-/*--------------------------------Estilos de Login---------------------------------------*/
-
-.style-first-div-login {
-  min-height: 100vh; /* Altura mínima 100% viewport */
-}
-.style-third-div-login {
-  width: 100%; /* Ancho completo */
-  max-width: 400px; /* Máximo ancho 400px */
-}
-.img-login {
-  max-height: 100px; /* Altura máxima */
-  object-fit: contain; /* Escala sin recortar */
+.style-third-div-login{
+    width: 100%;
+    max-width: 400px;
 }
 
-/*---------------------------------Estilos de Dashboard------------------------------------*/
-
-.dashboard-nav-styles {
-  width: 60px; /* Ancho fijo */
-  height: 60px; /* Alto fijo */
-}
-.dashboard-a-li-ul-styles {
-  transition: all 0.3s ease; /* Transición suave */
-}
-/* Transición para hover en enlaces laterales */
-.sidebar .nav-link:hover {
-  transform: translateX(5px); /* Desplaza a la derecha */
-}
-/* Efecto hover en tarjetas */
-.card {
-  transition: transform 0.2s ease, box-shadow 0.2s ease; /* Transición */
-}
-.card:hover {
-  transform: translateY(-2px); /* Sube tarjeta */
-}
-/* Estilos para Tabulator base */
-.tabulator {
-  border: none !important; /* Sin borde */
-  background: transparent !important; /* Fondo transparente */
-}
-.tabulator-header {
-  background: linear-gradient(135deg, #f8f9fa, #e9ecef) !important; /* Fondo degradado */
-  border: none !important; /* Sin borde */
-}
-.tabulator-row:hover {
-  background-color: rgba(13, 110, 253, 0.1) !important; /* Fondo azul claro */
-}
-.tabulator-selected {
-  background-color: rgba(13, 110, 253, 0.2) !important; /* Selección más intensa */
-}
-/* Estilos para responsive offcanvas en móviles */
-@media (max-width: 767px) {
-  .offcanvas-body .nav-link {
-    padding-left: 1rem; /* Padding izquierdo */
-  }
-}
-.space-navbar-stick {
-  height: 80px; /* Espacio para navbar fijo */
-}
-
-/*--------------TABLA TABULATOR DASHBOARD---------*/
-
-.tabulator .tabulator-col,
-.tabulator .tabulator-cell {
-  white-space: nowrap !important; /* Evita saltos de línea */
-}
-.tabulator {
-  overflow-x: auto; /* Scroll horizontal */
-  -webkit-overflow-scrolling: touch; /* Suaviza scroll en iOS */
-  width: 100%; /* Ancho total */
-  border-radius: 8px; /* Bordes redondeados */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra sutil */
-  margin-bottom: 30px; /* Margen inferior */
-}
-.tabulator-table {
-  min-width: 600px; /* Ancho mínimo para tabla */
-  touch-action: pan-x; /* Permite desplazamiento horizontal */
-  width: 100% !important; /* Ancho total con prioridad */
-}
-.tabulator-header {
-  background: linear-gradient(135deg, #f8f9fa, #e9ecef); /* Fondo degradado */
-  border-bottom: 2px solid #dee2e6; /* Borde inferior */
-}
-.tabulator-row:hover {
-  b.tabulator-row:hover {
-    background-color: rgba(255, 255, 255, 0.08) !important; /* Fondo blanco translúcido */
-  }
-}
-
-@media (max-width: 767px) {
-  .tabulator::-webkit-scrollbar {
-    height: 12px; /* Altura scrollbar */
-  }
-  .tabulator::-webkit-scrollbar-thumb {
-    background: #007bff; /* Color scrollbar */
-  }
-  .tabulator::after {
-    content: "← Desliza para ver más columnas →"; /* Texto guía */
-    position: absolute; /* Posicionamiento absoluto */
-    bottom: -25px; /* Debajo de la tabla */
-    left: 50%; /* Centrado horizontal */
-    transform: translateX(-50%); /* Centrado exacto */
-    font-size: 12px; /* Tamaño texto */
-    color: #007bff; /* Color azul */
-    font-weight: 500; /* Peso de fuente */
-  }
-  .tabulator-cell {
-    padding: 8px 6px !important; /* Espaciado interno */
-    font-size: 13px; /* Tamaño texto */
-  }
-  .tabulator-col {
-    padding: 10px 6px !important; /* Espaciado columnas */
-    font-size: 12px; /* Tamaño texto */
-    font-weight: 600; /* Negrita */
-  }
-}
-@media (min-width: 768px) {
-  .tabulator::-webkit-scrollbar {
-    height: 8px; /* Altura scrollbar para pantallas grandes */
-  }
+.img-login{
+    max-height: 100px;
+    object-fit: contain;
 }

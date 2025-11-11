@@ -1,42 +1,49 @@
 <footer class="text-center py-3">
-    <!-- Pie de página centrado con padding vertical -->
-    <p class="mb-0">
-        &copy; <?php echo date("Y"); ?> - Sistema. <!-- Muestra el año actual automáticamente -->
-    </p>
+    <!-- Sección de pie de página con alineación centrada y padding en la parte superior e inferior -->
+    
+    <p class="mb-0">&copy; <?php echo date("Y"); ?> - Sistema. </p>
+    <!-- Muestra el año actual dinámicamente con PHP, seguido del nombre del sistema -->
+    
 </footer>
 
-<!-- Bootstrap 5.3.7 Bundle: incluye Popper.js (necesario para tooltips, dropdowns, modales, etc.) -->
-<script src="<?php echo BASE_URL; ?>assets/js/bootstrap-5.3.7-dist/bootstrap.bundle.min.js"></script>
+<!-- Inclusión de bibliotecas JavaScript para funcionalidad del sistema -->
 
-<!-- Tabulator 6.3: Biblioteca para crear tablas dinámicas e interactivas -->
-<script src="<?php echo BASE_URL; ?>assets/tabulator-6.3/dist/js/tabulator.min.js"></script>
+<script src="<?php echo BASE_URL; ?>assets/js/bootstrap-5.3.3-dist/bootstrap.bundle.min.js"></script>
+<!-- Carga el bundle de Bootstrap 5.3, incluyendo Popper.js para elementos como tooltips y dropdowns -->
 
-<!-- Script para alternar entre tema claro y oscuro -->
+<script src="<?php echo BASE_URL; ?>assets/tabulator/js/tabulator.min.js"></script>
+<!-- Incluye Tabulator.js para la gestión y visualización avanzada de tablas en la interfaz -->
+
 <script src="<?php echo BASE_URL; ?>assets/js/theme.js"></script>
+<!-- Script para manejar temas visuales, probablemente alternando entre modo oscuro y claro -->
 
-<!-- Script para controlar modales generales -->
 <script src="<?php echo BASE_URL; ?>assets/js/modals.js"></script>
+<!-- Script general para controlar la apertura y cierre de los modales en el sistema -->
 
-<!-- Script específico para el modal de cierre de sesión -->
 <script src="<?php echo BASE_URL; ?>assets/js/modal_logout.js"></script>
+<!-- Script específico para el modal de cierre de sesión -->
 
-<!-- Script para el modal de registro de nuevos elementos (usuarios, productos, etc.) 
-<script src="<?php echo BASE_URL; ?>assets/js/modals_register.js"></script>-->
+<script src="<?php echo BASE_URL; ?>assets/js/modals_register.js"></script>
+<!-- Script para gestionar el registro de usuarios dentro de los modales -->
 
-<!-- Script con funciones generales reutilizables en todo el sistema 
-<script src="<?php echo BASE_URL; ?>assets/js/general-scripts.js"></script> -->
+<script src="<?php echo BASE_URL; ?>assets/js/script.js"></script>
+<!-- Archivo JavaScript principal del sistema que puede contener múltiples funciones -->
 
-<!-- jsPDF: Librería para generar archivos PDF desde el navegador -->
-<script src="<?php echo BASE_URL; ?>assets/js/export-tabulator/jspdf.umd.min.js"></script> 
+<!-- Bibliotecas para exportar datos -->
 
-<!-- jsPDF AutoTable: Plugin para crear tablas dentro de archivos PDF -->
-<script src="<?php echo BASE_URL; ?>assets/js/export-tabulator/jspdf.plugin.autotable.min.js"></script> 
+<script src="<?php echo BASE_URL; ?>assets/js/jspdf.umd.min.js"></script>
+<!-- jsPDF: Biblioteca para generar archivos PDF desde datos dinámicos -->
 
-<!-- XLSX.js: Librería para exportar datos a Excel (.xlsx) desde el navegador -->
-<script src="<?php echo BASE_URL; ?>assets/js/export-tabulator/xlsx.full.min.js"></script> 
+<script src="<?php echo BASE_URL; ?>assets/js/jspdf.plugin.autotable.min.js"></script>
+<!-- Plugin AutoTable para jsPDF, utilizado para exportar tablas en formato PDF -->
 
-<!-- SweetAlert2: Alertas modernas y personalizadas (reemplaza los alert() clásicos) -->
-<script src="<?php echo BASE_URL; ?>assets/sweetalert/sweetalert2-11.js"></script> 
+<script src="<?php echo BASE_URL; ?>assets/js/xlsx.full.min.js"></script>
+<!-- XLSX.js: Biblioteca para exportar datos a Excel (formato .xlsx) -->
+
+<!-- SweetAlert2 CSS y JS desde CDN -->
+<script src="<?php echo BASE_URL; ?>assets/sweetalert/sweetalert2-11.js"></script>
 
 </body>
+
 </html>
+

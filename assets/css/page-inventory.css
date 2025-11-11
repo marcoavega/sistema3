@@ -1,0 +1,76 @@
+.sidebar .nav-link:hover {
+    transform: translateX(5px);
+  }
+
+  .transition-all {
+    transition: all 0.3s ease;
+  }
+
+  .card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .card:hover {
+    transform: translateY(-2px);
+  }
+
+
+  /* Asegurar que los textos sean legibles en ambos temas */
+  .text-body {
+    color: var(--bs-body-color) !important;
+  }
+
+  .bg-body {
+    background-color: var(--bs-body-bg) !important;
+  }
+
+  .bg-body-secondary {
+    background-color: var(--bs-secondary-bg) !important;
+  }
+
+  /* Animaciones sutiles */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .card {
+    animation: fadeInUp 0.5s ease-out;
+  }
+
+  /* Botones con efectos */
+  .btn {
+    transition: all 0.3s ease;
+  }
+
+  .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Efectos para inputs */
+  .form-control:focus {
+    transform: scale(1.02);
+    transition: transform 0.2s ease;
+  }
+
+  /* Badges y elementos mejorados */
+  .badge {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.375rem 0.75rem;
+    border-radius: 6px;
+  }
+
+  /* Links hover effect */
+  .hover-primary:hover {
+    color: #007bff !important;
+    text-decoration: underline !important;
+  }
