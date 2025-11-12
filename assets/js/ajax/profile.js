@@ -1,29 +1,43 @@
 document.addEventListener("DOMContentLoaded", function () {
-  // Botón para abrir el modal de edición
   const editProfileBtn = document.getElementById("edit-profile-btn");
   const saveProfileChangesBtn = document.getElementById("saveProfileChanges");
 
+  if (!editProfileBtn || !saveProfileChangesBtn) return;
+
+  // Función para mostrar toasts
+  function toast(msg, err = false) {
+    const t = document.createElement("div");
+    t.textContent = msg;
+    t.style.position = "fixed";
+    t.style.bottom = "25px";
+    t.style.right = "25px";
+    t.style.padding = "10px 15px";
+    t.style.borderRadius = "8px";
+    t.style.background = err ? "#dc3545" : "#198754";
+    t.style.color = "white";
+    t.style.zIndex = 9999;
+    t.style.boxShadow = "0 3px 10px rgba(0,0,0,0.3)";
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 3000);
+  }
+
+  // Abrir modal
   editProfileBtn.addEventListener("click", function () {
-    const modal = new bootstrap.Modal(
-      document.getElementById("editProfileModal")
-    );
+    const modal = new bootstrap.Modal(document.getElementById("editProfileModal"));
     modal.show();
   });
 
-  // Botón para guardar cambios
+  // Guardar cambios
   saveProfileChangesBtn.addEventListener("click", function () {
     const form = document.getElementById("editProfileForm");
     const formData = new FormData(form);
 
     const password = document.getElementById("edit-password").value;
-    const confirmPassword = document.getElementById(
-      "edit-password-confirm"
-    ).value;
+    const confirmPassword = document.getElementById("edit-password-confirm").value;
 
-    // Validar que las contraseñas coincidan (solo si se ingresó una nueva contraseña)
     if (password !== "" && password !== confirmPassword) {
-      alert("Las contraseñas no coinciden");
-      return; // Detiene el envío del formulario
+      toast("Las contraseñas no coinciden", true);
+      return;
     }
 
     formData.append("username", document.getElementById("edit-username").value);
@@ -40,15 +54,15 @@ document.addEventListener("DOMContentLoaded", function () {
       })
       .then((data) => {
         if (!data.success) {
-          alert("Error al actualizar perfil: " + data.message);
+          toast("Error al actualizar el perfil: " + data.message, true);
         } else {
-          alert("Perfil actualizado correctamente");
-          location.reload();
+          toast("Perfil actualizado correctamente");
+          setTimeout(() => location.reload(), 1200);
         }
       })
       .catch((error) => {
         console.error("Error en la solicitud AJAX:", error);
+        toast("Error de conexión con el servidor", true);
       });
   });
-  
 });

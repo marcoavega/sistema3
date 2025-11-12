@@ -149,10 +149,11 @@ require_once __DIR__ . '/../partials/layouts/lateral_menu_products.php';
               <p class="mb-0 opacity-75 product-code"><i class="bi bi-upc-scan me-2"></i>Código: <?= htmlspecialchars($product['product_code']) ?></p>
             </div>
             <div class="text-end">
-              <span class="badge <?= $product['status'] ? 'bg-success' : 'bg-warning' ?> fs-6 px-3 py-2 rounded-pill">
+              <span id="productStatusBadge" class="badge <?= $product['status'] ? 'bg-success' : 'bg-warning' ?> fs-6 px-3 py-2 rounded-pill">
                 <i class="bi bi-<?= $product['status'] ? 'check-circle' : 'exclamation-triangle' ?> me-1"></i>
                 <?= $product['status'] ? 'Activo' : 'Inactivo' ?>
               </span>
+
             </div>
           </div>
 
@@ -160,13 +161,16 @@ require_once __DIR__ . '/../partials/layouts/lateral_menu_products.php';
             <!-- Imagen -->
             <div class="col-md-5 p-4 bg-body-secondary d-flex justify-content-center align-items-center">
               <?php if ($product['image_url']): ?>
-                <img id="productImage" src="<?= BASE_URL . htmlspecialchars($product['image_url']) ?>" class="img-fluid rounded-3 border shadow-sm" style="max-height:300px;">
-              <?php else: ?>
+                <img id="productImage" src="<?= BASE_URL . htmlspecialchars($product['image_url']) ?>" class="img-fluid rounded-3 border shadow-sm zoomable" style="max-height:300px;">
+                <?php else: ?>
                 <div class="text-center text-muted"><i class="bi bi-image fs-1"></i>
                   <p>Sin imagen</p>
                 </div>
               <?php endif; ?>
             </div>
+
+          
+
 
             <!-- Info -->
             <div class="col-md-7 p-4">
@@ -506,6 +510,29 @@ require_once __DIR__ . '/../partials/layouts/lateral_menu_products.php';
         document.querySelector(".product-price").textContent = `$${parseFloat(u.price ?? form["price"].value).toFixed(2)}`;
         document.querySelector(".product-stock").textContent = u.stock ?? form["stock"].value;
 
+        // 🔹 Actualizar el estado (Activo/Inactivo) en tiempo real
+        const statusBadge = document.getElementById('productStatusBadge');
+        const statusFromServer = (typeof u.status !== 'undefined') ? u.status : null;
+        let statusVal = null;
+        if (statusFromServer !== null) {
+          statusVal = parseInt(statusFromServer) === 1 ? 1 : 0;
+        } else {
+          const s = form.querySelector('#edit-status')?.value;
+          statusVal = (s === '1' || s === 1) ? 1 : 0;
+        }
+
+        if (statusBadge) {
+          statusBadge.classList.remove('bg-success', 'bg-warning', 'text-white');
+          if (statusVal === 1) {
+            statusBadge.classList.add('bg-success', 'text-white');
+            statusBadge.innerHTML = `<i class="bi bi-check-circle me-1"></i> Activo`;
+          } else {
+            statusBadge.classList.add('bg-warning', 'text-white');
+            statusBadge.innerHTML = `<i class="bi bi-exclamation-triangle me-1"></i> Inactivo`;
+          }
+        }
+
+
         if (u.image_url) {
           const img = document.getElementById("productImage");
           if (img) img.src = `${BASE_URL}${u.image_url}?v=${Date.now()}`;
@@ -523,6 +550,48 @@ require_once __DIR__ . '/../partials/layouts/lateral_menu_products.php';
   });
 </script>
 
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  // Selector de imágenes que abrirán el modal: puedes usar #productImage u otras con clase 'zoomable'
+  const zoomableSelector = ".zoomable, #productImage";
+  const previewModalEl = document.getElementById("imagePreviewModal");
+  const previewImg = document.getElementById("imagePreviewModalImg");
+
+  if (!previewModalEl || !previewImg) return;
+
+  const modalInstance = new bootstrap.Modal(previewModalEl, {
+    keyboard: true,
+    backdrop: true
+  });
+
+  // Añadimos listener a todas las imágenes existentes que encajen con el selector
+  function attachZoomListeners() {
+    const imgs = document.querySelectorAll(zoomableSelector);
+    imgs.forEach(img => {
+      // evitar múltiples listeners
+      if (img.dataset.zoomAttached) return;
+      img.dataset.zoomAttached = "1";
+
+      img.addEventListener("click", (e) => {
+        const src = img.getAttribute("src") || img.dataset.src;
+        if (!src) return;
+        // usar cache-buster para forzar recarga si se actualizó la imagen
+        const cacheBusted = src + (src.includes('?') ? '&' : '?') + 'v=' + Date.now();
+        previewImg.src = cacheBusted;
+        previewImg.alt = img.alt || 'Imagen del producto';
+        modalInstance.show();
+      });
+    });
+  }
+
+  attachZoomListeners();
+
+  // Si cargas/actualizas la imagen dinámicamente y quieres re-attach (por ejemplo tras editar),
+  // llama a attachZoomListeners() de nuevo desde donde actualizas la imagen.
+});
+</script>
+
+
 <style>
   .sidebar .nav-link:hover {
     transform: translateX(5px);
@@ -535,7 +604,32 @@ require_once __DIR__ . '/../partials/layouts/lateral_menu_products.php';
   .card:hover {
     transform: translateY(-2px);
   }
+
+
+  /* Cursor pointer para miniaturas zoomables */
+.zoomable {
+  cursor: pointer;
+  transition: transform .15s ease;
+}
+.zoomable:hover {
+  transform: scale(1.02);
+}
+
 </style>
+
+
+  <!-- Modal imagen grande -->
+  <div class="modal fade" id="imagePreviewModal" tabindex="-1" aria-labelledby="imagePreviewModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-xl">
+    <div class="modal-content border-0 bg-transparent">
+      <div class="modal-body p-0 d-flex justify-content-center align-items-center">
+        <button type="button" class="btn-close position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        <img id="imagePreviewModalImg" src="" alt="Vista previa" class="img-fluid rounded" style="max-width:100%; max-height:80vh; object-fit:contain;">
+      </div>
+    </div>
+  </div>
+</div>
+
 
 <?php
 $content = ob_get_clean();
