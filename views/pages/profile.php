@@ -75,20 +75,20 @@ $content = ob_get_clean();
 include __DIR__ . '/../partials/layouts/navbar.php';
 ?>
 
+<script>
+  // USER ID para los logs (usado por profile-logs.js)
+  window.PROFILE_USER_ID = <?= (int) $user['user_id'] ?>;
+</script>
+
+<!-- Tabulator logs -->
+<script src="<?= BASE_URL ?>assets/js/ajax/profile-logs.js"></script>
+
+
 <!-- JS de perfil -->
 <script src="<?= BASE_URL ?>assets/js/ajax/profile.js"></script>
 
 <!-- Tabulator para actividad reciente -->
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
-    new Tabulator("#activity-table", {
-      layout: "fitColumns",
-      placeholder: "No hay actividad reciente",
-      data: [],
-      columns: [
-        { title: "Fecha", field: "date", sorter: "date", hozAlign: "center" },
-        { title: "Acción", field: "action", hozAlign: "center" },
-      ]
-    });
-  });
-</script>
+<!-- JS de perfil -->
+<script src="<?= BASE_URL ?>assets/js/ajax/profile.js"></script>
+<script src="<?= BASE_URL ?>assets/js/ajax/profile-activity.js"></script>
+

@@ -1,6 +1,5 @@
 <?php
 // api/products.php
-
 // Mostrar errores en desarrollo (retirar en producción)
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -36,7 +35,7 @@ if ($action === 'list') {
         SELECT 
             product_id, product_code, barcode, product_name, product_description, location, price, stock, registration_date,
             category_id, supplier_id, unit_id, currency_id, image_url, subcategory_id,
-            desired_stock, status
+            desired_stock, status, sale_price, weight, height, length, width, diameter
         FROM products
         WHERE 1=1
     ";
@@ -154,6 +153,14 @@ switch ($action) {
         if (isset($_POST['subcategory_id'])) $data['subcategory_id'] = $_POST['subcategory_id'];
         if (isset($_POST['desired_stock']))  $data['desired_stock'] = $_POST['desired_stock'];
         if (isset($_POST['status']))         $data['status'] = $_POST['status'];
+        // Campos nuevos: aceptar valor o null si viene vacío
+        if (isset($_POST['sale_price']) && $_POST['sale_price'] !== '') $data['sale_price'] = str_replace(',', '.', $_POST['sale_price']);
+        if (isset($_POST['weight']) && $_POST['weight'] !== '')       $data['weight']     = str_replace(',', '.', $_POST['weight']);
+        if (isset($_POST['height']) && $_POST['height'] !== '')       $data['height']     = str_replace(',', '.', $_POST['height']);
+        if (isset($_POST['length']) && $_POST['length'] !== '')       $data['length']     = str_replace(',', '.', $_POST['length']);
+        if (isset($_POST['width']) && $_POST['width'] !== '')         $data['width']      = str_replace(',', '.', $_POST['width']);
+        if (isset($_POST['diameter']) && $_POST['diameter'] !== '')   $data['diameter']   = str_replace(',', '.', $_POST['diameter']);
+
 
         // Validaciones básicas:
         if (empty($data['product_code']) || empty($data['product_name'])) {
@@ -247,6 +254,14 @@ switch ($action) {
         if (isset($_POST['desired_stock']))  $data['desired_stock'] = $_POST['desired_stock'];
         if (isset($_POST['status']))         $data['status'] = $_POST['status'];
         if (isset($_POST['product_description'])) $data['product_description'] = trim($_POST['product_description']);
+        // Campos nuevos: aceptar valor o null si viene vacío
+        if (isset($_POST['sale_price'])) $data['sale_price'] = $_POST['sale_price'] !== '' ? str_replace(',', '.', $_POST['sale_price']) : null;
+        if (isset($_POST['weight']))     $data['weight']     = $_POST['weight']     !== '' ? str_replace(',', '.', $_POST['weight']) : null;
+        if (isset($_POST['height']))     $data['height']     = $_POST['height']     !== '' ? str_replace(',', '.', $_POST['height']) : null;
+        if (isset($_POST['length']))     $data['length']     = $_POST['length']     !== '' ? str_replace(',', '.', $_POST['length']) : null;
+        if (isset($_POST['width']))      $data['width']      = $_POST['width']      !== '' ? str_replace(',', '.', $_POST['width']) : null;
+        if (isset($_POST['diameter']))   $data['diameter']   = $_POST['diameter']   !== '' ? str_replace(',', '.', $_POST['diameter']) : null;
+
 
         // Otros opcionales...
 

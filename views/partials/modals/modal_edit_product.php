@@ -286,6 +286,99 @@ try {
             </div>
           </div>
 
+         <!-- Dimensiones y Peso (EDIT) -->
+<div class="card border-0 shadow-sm mb-4 mt-4">
+  <div class="card-header border-0 py-3">
+    <h6 class="card-title mb-0">
+      <i class="fas fa-ruler-combined me-2"></i>
+      Dimensiones y Peso
+    </h6>
+  </div>
+
+  <div class="card-body">
+    <div class="row g-3">
+
+      <div class="col-md-4">
+        <label for="edit-sale-price" class="form-label fw-semibold">
+          <i class="fas fa-tags me-1 text-muted"></i>
+          Precio de Venta
+        </label>
+        <div class="input-group input-group-lg">
+          <span class="input-group-text text-white">$</span>
+          <input type="number" step="0.01" id="edit-sale-price" name="sale_price" class="form-control">
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <label for="edit-weight" class="form-label fw-semibold">
+          <i class="fas fa-weight-hanging me-1 text-muted"></i>
+          Peso (kg)
+        </label>
+        <div class="input-group input-group-lg">
+          <span class="input-group-text text-white">
+            <i class="fas fa-balance-scale"></i>
+          </span>
+          <input type="number" step="0.0001" id="edit-weight" name="weight" class="form-control">
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <label for="edit-height" class="form-label fw-semibold">
+          <i class="fas fa-arrows-alt-v me-1 text-muted"></i>
+          Alto (cm)
+        </label>
+        <div class="input-group input-group-lg">
+          <span class="input-group-text text-white">
+            <i class="fas fa-ruler-vertical"></i>
+          </span>
+          <input type="number" step="0.0001" id="edit-height" name="height" class="form-control">
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <label for="edit-length" class="form-label fw-semibold">
+          <i class="fas fa-ruler-horizontal me-1 text-muted"></i>
+          Largo (cm)
+        </label>
+        <div class="input-group input-group-lg">
+          <span class="input-group-text text-white">
+            <i class="fas fa-ruler-horizontal"></i>
+          </span>
+          <input type="number" step="0.0001" id="edit-length" name="length" class="form-control">
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <label for="edit-width" class="form-label fw-semibold">
+          <i class="fas fa-ruler-combined me-1 text-muted"></i>
+          Ancho (cm)
+        </label>
+        <div class="input-group input-group-lg">
+          <span class="input-group-text text-white">
+            <i class="fas fa-ruler-horizontal"></i>
+          </span>
+          <input type="number" step="0.0001" id="edit-width" name="width" class="form-control">
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <label for="edit-diameter" class="form-label fw-semibold">
+          <i class="fas fa-circle-notch me-1 text-muted"></i>
+          Diámetro (cm)
+        </label>
+        <div class="input-group input-group-lg">
+          <span class="input-group-text text-white">
+            <i class="fas fa-circle"></i>
+          </span>
+          <input type="number" step="0.0001" id="edit-diameter" name="diameter" class="form-control">
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
         </form>
       </div>
 
@@ -307,51 +400,53 @@ try {
 </div>
 
 <style>
-.form-control:focus, .form-select:focus {
-  border-color: #667eea;
-  box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
-}
-
-.card {
-  transition: transform 0.2s ease-in-out;
-}
-
-.card:hover {
-  transform: translateY(-2px);
-}
-
-.input-group-text {
-  border: 1px solid #dee2e6;
-}
-
-.form-control.border-start-0 {
-  border-left: none !important;
-}
-
-.input-group-text.border-end-0 {
-  border-right: none !important;
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
+  .form-control:focus,
+  .form-select:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+
+  .card {
+    transition: transform 0.2s ease-in-out;
   }
-}
 
-.modal.show .modal-dialog {
-  animation: fadeInUp 0.3s ease-out;
-}
+  .card:hover {
+    transform: translateY(-2px);
+  }
 
-.btn {
-  transition: all 0.2s ease-in-out;
-}
+  .input-group-text {
+    border: 1px solid #dee2e6;
+  }
 
-.btn:hover {
-  transform: translateY(-1px);
-}
+  .form-control.border-start-0 {
+    border-left: none !important;
+  }
+
+  .input-group-text.border-end-0 {
+    border-right: none !important;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .modal.show .modal-dialog {
+    animation: fadeInUp 0.3s ease-out;
+  }
+
+  .btn {
+    transition: all 0.2s ease-in-out;
+  }
+
+  .btn:hover {
+    transform: translateY(-1px);
+  }
 </style>

@@ -37,7 +37,7 @@ $subcategories = $pdo->query("SELECT subcategory_id, subcategory_name FROM subca
 
       <div class="modal-body p-4">
         <form id="addProductForm" enctype="multipart/form-data">
-          
+
           <!-- Información Básica -->
           <div class="card border-0 shadow-sm mb-4">
             <div class="card-header border-0 py-3">
@@ -54,24 +54,24 @@ $subcategories = $pdo->query("SELECT subcategory_id, subcategory_name FROM subca
                     Código de Producto
                   </label>
                   <div class="input-group">
-                      <i class="fas fa-hashtag text-muted"></i>
+                    <i class="fas fa-hashtag text-muted"></i>
                     </span>
                     <input type="text" class="form-control ps-0" id="new-product-code" name="product_code" required placeholder=" Ej. PROD001">
                   </div>
                 </div>
-                
+
                 <div class="col-md-6">
                   <label for="new-barcode" class="form-label fw-semibold">
                     <i class="fas fa-qrcode me-1 text-muted"></i>
                     Código de Barras
                   </label>
                   <div class="input-group">
-                      <i class="fas fa-barcode text-muted"></i>
+                    <i class="fas fa-barcode text-muted"></i>
                     </span>
                     <input type="text" class="form-control ps-0" id="new-barcode" placeholder=" 7501234567890">
                   </div>
                 </div>
-                
+
                 <div class="col-12">
                   <label for="new-product-name" class="form-label fw-semibold">
                     <i class="fas fa-tag me-1 text-muted"></i>
@@ -79,7 +79,7 @@ $subcategories = $pdo->query("SELECT subcategory_id, subcategory_name FROM subca
                   </label>
                   <input type="text" class="form-control form-control-lg" id="new-product-name" name="product_name" required placeholder="Ingrese el nombre del producto">
                 </div>
-                
+
                 <div class="col-12">
                   <label for="product_description" class="form-label fw-semibold">
                     <i class="fas fa-align-left me-1 text-muted"></i>
@@ -115,7 +115,7 @@ $subcategories = $pdo->query("SELECT subcategory_id, subcategory_name FROM subca
                     <?php endforeach; ?>
                   </select>
                 </div>
-                
+
                 <div class="col-md-6">
                   <label for="new-subcategory" class="form-label fw-semibold">
                     <i class="fas fa-folder-open me-1 text-muted"></i>
@@ -154,7 +154,7 @@ $subcategories = $pdo->query("SELECT subcategory_id, subcategory_name FROM subca
                     <input type="number" step="0.01" class="form-control" id="new-price" name="price" required placeholder="0.00">
                   </div>
                 </div>
-                
+
                 <div class="col-md-4">
                   <label for="new-stock" class="form-label fw-semibold">
                     <i class="fas fa-boxes me-1 text-muted"></i>
@@ -167,7 +167,7 @@ $subcategories = $pdo->query("SELECT subcategory_id, subcategory_name FROM subca
                     <input type="number" class="form-control" id="new-stock" name="stock" required placeholder="0">
                   </div>
                 </div>
-                
+
                 <div class="col-md-4">
                   <label for="new-desired-stock" class="form-label fw-semibold">
                     <i class="fas fa-bullseye me-1 text-muted"></i>
@@ -180,7 +180,7 @@ $subcategories = $pdo->query("SELECT subcategory_id, subcategory_name FROM subca
                     <input type="number" class="form-control" id="new-desired-stock" name="desired_stock" placeholder="0">
                   </div>
                 </div>
-                
+
                 <div class="col-md-6">
                   <label for="new-unit" class="form-label fw-semibold">
                     <i class="fas fa-ruler me-1 text-muted"></i>
@@ -195,7 +195,7 @@ $subcategories = $pdo->query("SELECT subcategory_id, subcategory_name FROM subca
                     <?php endforeach; ?>
                   </select>
                 </div>
-                
+
                 <div class="col-md-6">
                   <label for="new-currency" class="form-label fw-semibold">
                     <i class="fas fa-coins me-1 text-muted"></i>
@@ -238,19 +238,19 @@ $subcategories = $pdo->query("SELECT subcategory_id, subcategory_name FROM subca
                     <?php endforeach; ?>
                   </select>
                 </div>
-                
+
                 <div class="col-md-6">
                   <label for="new-location" class="form-label fw-semibold">
                     <i class="fas fa-map-marker-alt me-1 text-muted"></i>
                     Ubicación
                   </label>
                   <div class="input-group input-group-lg">
-                      <i class="fas fa-warehouse text-muted"></i>
+                    <i class="fas fa-warehouse text-muted"></i>
                     </span>
                     <input type="text" class="form-control" id="new-location" name="location" placeholder="Ej. Estante A-1">
                   </div>
                 </div>
-                
+
                 <div class="col-md-6">
                   <label for="new-status" class="form-label fw-semibold">
                     <i class="fas fa-toggle-on me-1 text-muted"></i>
@@ -261,7 +261,7 @@ $subcategories = $pdo->query("SELECT subcategory_id, subcategory_name FROM subca
                     <option value="0">❌ Inactivo</option>
                   </select>
                 </div>
-                
+
                 <div class="col-md-6">
                   <label for="new-image" class="form-label fw-semibold">
                     <i class="fas fa-image me-1 text-muted"></i>
@@ -281,6 +281,89 @@ $subcategories = $pdo->query("SELECT subcategory_id, subcategory_name FROM subca
               </div>
             </div>
           </div>
+<!-- Dimensiones y Peso -->
+<div class="card border-0 shadow-sm mb-4 mt-4">
+  <div class="card-header border-0 py-3">
+    <h6 class="card-title mb-0">
+      <i class="fas fa-ruler-combined me-2"></i>
+      Dimensiones y Peso
+    </h6>
+  </div>
+
+  <div class="card-body">
+    <div class="row g-3">
+
+      <div class="col-md-4">
+        <label for="new-sale-price" class="form-label fw-semibold">
+          <i class="fas fa-tags me-1 text-muted"></i>
+          Precio de Venta
+        </label>
+        <div class="input-group input-group-lg">
+          <span class="input-group-text text-white">$</span>
+          <input type="number" step="0.01" id="new-sale-price" name="sale_price" class="form-control" placeholder="0.00">
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <label for="new-weight" class="form-label fw-semibold">
+          <i class="fas fa-weight-hanging me-1 text-muted"></i>
+          Peso (kg)
+        </label>
+        <div class="input-group input-group-lg">
+          <span class="input-group-text text-white"><i class="fas fa-balance-scale"></i></span>
+          <input type="number" step="0.0001" id="new-weight" name="weight" class="form-control" placeholder="0.0000">
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <label for="new-height" class="form-label fw-semibold">
+          <i class="fas fa-arrows-alt-v me-1 text-muted"></i>
+          Alto (cm)
+        </label>
+        <div class="input-group input-group-lg">
+          <span class="input-group-text text-white"><i class="fas fa-ruler-vertical"></i></span>
+          <input type="number" step="0.0001" id="new-height" name="height" class="form-control" placeholder="0.0000">
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <label for="new-length" class="form-label fw-semibold">
+          <i class="fas fa-ruler-horizontal me-1 text-muted"></i>
+          Largo (cm)
+        </label>
+        <div class="input-group input-group-lg">
+          <span class="input-group-text text-white"><i class="fas fa-ruler-horizontal"></i></span>
+          <input type="number" step="0.0001" id="new-length" name="length" class="form-control" placeholder="0.0000">
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <label for="new-width" class="form-label fw-semibold">
+          <i class="fas fa-ruler-combined me-1 text-muted"></i>
+          Ancho (cm)
+        </label>
+        <div class="input-group input-group-lg">
+          <span class="input-group-text text-white"><i class="fas fa-ruler-horizontal"></i></span>
+          <input type="number" step="0.0001" id="new-width" name="width" class="form-control" placeholder="0.0000">
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <label for="new-diameter" class="form-label fw-semibold">
+          <i class="fas fa-circle-notch me-1 text-muted"></i>
+          Diámetro (cm)
+        </label>
+        <div class="input-group input-group-lg">
+          <span class="input-group-text text-white"><i class="fas fa-circle"></i></span>
+          <input type="number" step="0.0001" id="new-diameter" name="diameter" class="form-control" placeholder="0.0000">
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
 
         </form>
       </div>
@@ -302,4 +385,3 @@ $subcategories = $pdo->query("SELECT subcategory_id, subcategory_name FROM subca
     </div>
   </div>
 </div>
-

@@ -89,130 +89,132 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Configuración de columnas - TODAS VISIBLES CON ESPACIOS OPTIMIZADOS
     columns: [
-  {
-    title: "ID",
-    field: "product_id",
-    hozAlign: "center",
-    sorter: "number",
-    widthGrow: 1,
-  },
-  {
-    title: "Código",
-    field: "product_code",
-    widthGrow: 1,
-  },
-  {
-    title: "Código Barras",
-    field: "barcode",
-    widthGrow: 1,
-  },
-  {
-    title: "Name",
-    field: "product_name",
-    widthGrow: 1,
-    formatter: function (cell) {
-      const data = cell.getData();
-      const productId = data.product_id;
-      const name = cell.getValue();
-      const link = BASE_URL + "product_detail?id=" + encodeURIComponent(productId);
-      return `<a href="${link}" class="text-decoration-none fw-semibold">${name}</a>`;
-    },
-  },
-  {
-    title: "Ubicación",
-    field: "location",
-    widthGrow: 1,
-    headerSort: true,
-    formatter: function (cell) {
-      const value = cell.getValue();
-      if (!value) return '<span class="text-muted">Sin ubicación</span>';
-      return `<span class="badge bg-light text-dark border">${value}</span>`;
-    },
-  },
-  {
-    title: "Precio",
-    field: "price",
-    hozAlign: "right",
-    widthGrow: 1,
-    headerSort: true,
-    formatter: function (cell) {
-      const value = cell.getValue();
-      if (value == null || value === "")
-        return '<span class="text-muted">N/A</span>';
-      return `<span class="fw-bold">${parseFloat(value).toLocaleString(
-        "es-MX",
-        { minimumFractionDigits: 2, maximumFractionDigits: 2 }
-      )}</span>`;
-    },
-  },
-  {
-    title: "Stock",
-    field: "stock",
-    hozAlign: "center",
-    sorter: "number",
-    widthGrow: 1,
-    headerSort: true,
-    formatter: function (cell) {
-      const stock = parseInt(cell.getValue());
-      const row = cell.getData();
-      const desiredStock = parseInt(row.desired_stock);
-      let badgeClass = "bg-secondary";
-      if (!isNaN(stock) && !isNaN(desiredStock)) {
-        if (stock < desiredStock) badgeClass = "bg-danger";
-        else if (stock === desiredStock) badgeClass = "bg-warning text-dark";
-        else badgeClass = "bg-success";
-      }
-      return `<span class="badge ${badgeClass}">${stock}</span>`;
-    },
-  },
-  {
-    title: "Fecha",
-    field: "registration_date",
-    widthGrow: 1,
-    headerSort: true,
-    formatter: function (cell) {
-      const value = cell.getValue();
-      if (!value) return '<span class="text-muted">N/A</span>';
-      const date = new Date(value);
-      if (isNaN(date.getTime()))
-        return '<span class="text-muted">Fecha inválida</span>';
-      const day = String(date.getDate()).padStart(2, "0");
-      const month = String(date.getMonth() + 1).padStart(2, "0");
-      const year = date.getFullYear();
-      return `<small class="text-muted">${day}/${month}/${year}</small>`;
-    },
-    cssClass: "small",
-  },
-  {
-    title: "Imagen",
-    field: "image_url",
-    hozAlign: "center",
-    widthGrow: 1,
-    formatter: function (cell) {
-      const row = cell.getData();
-      if (!row.image_url) {
-        return '<div class="d-flex justify-content-center"><i class="fas fa-image text-muted" style="font-size:24px;"></i></div>';
-      }
-      const version = row.image_version || Date.now();
-      const src = BASE_URL + row.image_url + "?v=" + version;
-      return `<div class="d-flex justify-content-center">
+      {
+        title: "ID",
+        field: "product_id",
+        hozAlign: "center",
+        sorter: "number",
+        widthGrow: 1,
+      },
+      {
+        title: "Código",
+        field: "product_code",
+        widthGrow: 1,
+      },
+      {
+        title: "Código Barras",
+        field: "barcode",
+        widthGrow: 1,
+      },
+      {
+        title: "Name",
+        field: "product_name",
+        widthGrow: 1,
+        formatter: function (cell) {
+          const data = cell.getData();
+          const productId = data.product_id;
+          const name = cell.getValue();
+          const link =
+            BASE_URL + "product_detail?id=" + encodeURIComponent(productId);
+          return `<a href="${link}" class="text-decoration-none fw-semibold">${name}</a>`;
+        },
+      },
+      {
+        title: "Ubicación",
+        field: "location",
+        widthGrow: 1,
+        headerSort: true,
+        formatter: function (cell) {
+          const value = cell.getValue();
+          if (!value) return '<span class="text-muted">Sin ubicación</span>';
+          return `<span class="badge bg-light text-dark border">${value}</span>`;
+        },
+      },
+      {
+        title: "Precio",
+        field: "price",
+        hozAlign: "right",
+        widthGrow: 1,
+        headerSort: true,
+        formatter: function (cell) {
+          const value = cell.getValue();
+          if (value == null || value === "")
+            return '<span class="text-muted">N/A</span>';
+          return `<span class="fw-bold">${parseFloat(value).toLocaleString(
+            "es-MX",
+            { minimumFractionDigits: 2, maximumFractionDigits: 2 }
+          )}</span>`;
+        },
+      },
+      {
+        title: "Stock",
+        field: "stock",
+        hozAlign: "center",
+        sorter: "number",
+        widthGrow: 1,
+        headerSort: true,
+        formatter: function (cell) {
+          const stock = parseInt(cell.getValue());
+          const row = cell.getData();
+          const desiredStock = parseInt(row.desired_stock);
+          let badgeClass = "bg-secondary";
+          if (!isNaN(stock) && !isNaN(desiredStock)) {
+            if (stock < desiredStock) badgeClass = "bg-danger";
+            else if (stock === desiredStock)
+              badgeClass = "bg-warning text-dark";
+            else badgeClass = "bg-success";
+          }
+          return `<span class="badge ${badgeClass}">${stock}</span>`;
+        },
+      },
+      {
+        title: "Fecha",
+        field: "registration_date",
+        widthGrow: 1,
+        headerSort: true,
+        formatter: function (cell) {
+          const value = cell.getValue();
+          if (!value) return '<span class="text-muted">N/A</span>';
+          const date = new Date(value);
+          if (isNaN(date.getTime()))
+            return '<span class="text-muted">Fecha inválida</span>';
+          const day = String(date.getDate()).padStart(2, "0");
+          const month = String(date.getMonth() + 1).padStart(2, "0");
+          const year = date.getFullYear();
+          return `<small class="text-muted">${day}/${month}/${year}</small>`;
+        },
+        cssClass: "small",
+      },
+      {
+        title: "Imagen",
+        field: "image_url",
+        hozAlign: "center",
+        widthGrow: 1,
+        formatter: function (cell) {
+          const row = cell.getData();
+          if (!row.image_url) {
+            return '<div class="d-flex justify-content-center"><i class="fas fa-image text-muted" style="font-size:24px;"></i></div>';
+          }
+          const version = row.image_version || Date.now();
+          const src = BASE_URL + row.image_url + "?v=" + version;
+          return `<div class="d-flex justify-content-center">
                 <img src="${src}"
                      style="max-height:40px; max-width:40px; border-radius:6px; object-fit:cover;"
                      alt="Imagen"
                      loading="lazy"
                      class="border shadow-sm"/>
               </div>`;
-    },
-  },
-  {
-    title: "Acciones",
-    hozAlign: "center",
-    widthGrow: 1,
-    headerSort: false,
-    formatter: function () {
-      const isMobile = window.innerWidth < 768;
-      if (isMobile) {
-        return `
+        },
+      },
+      {
+        title: "Acciones",
+        hozAlign: "center",
+        widthGrow: 1,
+        headerSort: false,
+        formatter: function () {
+          const isMobile = window.innerWidth < 768;
+          if (isMobile) {
+            return `
           <div class="btn-group-vertical btn-group-sm d-grid gap-1" role="group">
             <button class="btn btn-outline-primary btn-sm edit-btn" title="Editar">
               Editar
@@ -221,8 +223,8 @@ document.addEventListener("DOMContentLoaded", function () {
               Borrar
             </button>
           </div>`;
-      } else {
-        return `
+          } else {
+            return `
           <div class="btn-group">
             <button class="btn btn-sm btn-outline-primary edit-btn me-1">
               <i class="bi bi-pencil-square"></i>
@@ -231,40 +233,70 @@ document.addEventListener("DOMContentLoaded", function () {
               <i class="bi bi-trash3"></i>
             </button>
           </div>`;
-      }
-    },
-    cellClick: function (e, cell) {
-      const rowData = cell.getRow().getData();
-      // EDITAR
-      if (e.target.classList.contains("edit-btn") || e.target.closest(".edit-btn")) {
-        document.getElementById("edit-product-id").value = rowData.product_id;
-        document.getElementById("edit-product-code").value = rowData.product_code || "";
-        document.getElementById("edit-barcode").value = rowData.barcode || "";
-        document.getElementById("edit-product-name").value = rowData.product_name || "";
-        document.getElementById("edit-product-description").value = rowData.product_description || "";
-        document.getElementById("edit-location").value = rowData.location || "";
-        document.getElementById("edit-price").value = rowData.price ?? "";
-        document.getElementById("edit-stock").value = rowData.stock ?? "";
-        document.getElementById("edit-category").value = rowData.category_id ?? "";
-        document.getElementById("edit-supplier").value = rowData.supplier_id ?? "";
-        document.getElementById("edit-unit").value = rowData.unit_id ?? "";
-        document.getElementById("edit-currency").value = rowData.currency_id ?? "";
-        document.getElementById("edit-subcategory").value = rowData.subcategory_id ?? "";
-        document.getElementById("edit-desired-stock").value = rowData.desired_stock ?? "";
-        document.getElementById("edit-status").value = rowData.status != null ? rowData.status : "1";
-        var editModalEl = document.getElementById("editProductModal");
-        if (editModalEl) new bootstrap.Modal(editModalEl).show();
-      }
-      // ELIMINAR
-      if (e.target.classList.contains("delete-btn") || e.target.closest(".delete-btn")) {
-        deleteProductID = rowData.product_id;
-        var deleteModalEl = document.getElementById("deleteProductModal");
-        if (deleteModalEl) new bootstrap.Modal(deleteModalEl).show();
-      }
-    },
-  },
-],
+          }
+        },
+        cellClick: function (e, cell) {
+          const rowData = cell.getRow().getData();
+          // EDITAR
+          if (
+            e.target.classList.contains("edit-btn") ||
+            e.target.closest(".edit-btn")
+          ) {
+            document.getElementById("edit-product-id").value =
+              rowData.product_id;
+            document.getElementById("edit-product-code").value =
+              rowData.product_code || "";
+            document.getElementById("edit-barcode").value =
+              rowData.barcode || "";
+            document.getElementById("edit-product-name").value =
+              rowData.product_name || "";
+            document.getElementById("edit-product-description").value =
+              rowData.product_description || "";
+            document.getElementById("edit-location").value =
+              rowData.location || "";
+            document.getElementById("edit-price").value = rowData.price ?? "";
+            document.getElementById("edit-stock").value = rowData.stock ?? "";
+            document.getElementById("edit-category").value =
+              rowData.category_id ?? "";
+            document.getElementById("edit-supplier").value =
+              rowData.supplier_id ?? "";
+            document.getElementById("edit-unit").value = rowData.unit_id ?? "";
+            document.getElementById("edit-currency").value =
+              rowData.currency_id ?? "";
+            document.getElementById("edit-subcategory").value =
+              rowData.subcategory_id ?? "";
+            document.getElementById("edit-desired-stock").value =
+              rowData.desired_stock ?? "";
+            document.getElementById("edit-status").value =
+              rowData.status != null ? rowData.status : "1";
 
+            // --- LÍNEAS SOLICITADAS: rellenar inputs de medidas y peso ---
+            // Asegúrate de que los elementos existan en el modal (IDs mostrados abajo)
+            // === CAMPOS NUEVOS (EDIT) ===
+            document.getElementById("edit-sale-price").value = rowData.sale_price ?? "";
+            document.getElementById("edit-weight").value = rowData.weight ?? "";
+            document.getElementById("edit-height").value = rowData.height ?? "";
+            document.getElementById("edit-length").value = rowData.length ?? "";
+            document.getElementById("edit-width").value = rowData.width ?? "";
+            document.getElementById("edit-diameter").value = rowData.diameter ?? "";
+
+            // ----------------------------------------------------------------
+
+            var editModalEl = document.getElementById("editProductModal");
+            if (editModalEl) new bootstrap.Modal(editModalEl).show();
+          }
+          // ELIMINAR
+          if (
+            e.target.classList.contains("delete-btn") ||
+            e.target.closest(".delete-btn")
+          ) {
+            deleteProductID = rowData.product_id;
+            var deleteModalEl = document.getElementById("deleteProductModal");
+            if (deleteModalEl) new bootstrap.Modal(deleteModalEl).show();
+          }
+        },
+      },
+    ],
 
     // Configuración adicional para mejorar la experiencia
     headerSort: true,
@@ -502,6 +534,21 @@ document.addEventListener("DOMContentLoaded", function () {
         });
         return;
       }
+
+      // NUEVOS campos (add)
+      var salePriceEl = document.getElementById("new-sale-price");
+      if (salePriceEl) formData.append("sale_price", salePriceEl.value);
+      var weightEl = document.getElementById("new-weight");
+      if (weightEl) formData.append("weight", weightEl.value);
+      var heightEl = document.getElementById("new-height");
+      if (heightEl) formData.append("height", heightEl.value);
+      var lengthEl = document.getElementById("new-length");
+      if (lengthEl) formData.append("length", lengthEl.value);
+      var widthEl = document.getElementById("new-width");
+      if (widthEl) formData.append("width", widthEl.value);
+      var diameterEl = document.getElementById("new-diameter");
+      if (diameterEl) formData.append("diameter", diameterEl.value);
+
       fetch(BASE_URL + "api/products.php?action=create", {
         method: "POST",
         body: formData,
@@ -590,6 +637,21 @@ document.addEventListener("DOMContentLoaded", function () {
       if (imageEl2 && imageEl2.files && imageEl2.files.length > 0) {
         formData.append("image_file", imageEl2.files[0]);
       }
+
+      // NUEVOS campos (edit)
+      var salePriceEl2 = document.getElementById("edit-sale-price");
+      if (salePriceEl2) formData.append("sale_price", salePriceEl2.value);
+      var weightEl2 = document.getElementById("edit-weight");
+      if (weightEl2) formData.append("weight", weightEl2.value);
+      var heightEl2 = document.getElementById("edit-height");
+      if (heightEl2) formData.append("height", heightEl2.value);
+      var lengthEl2 = document.getElementById("edit-length");
+      if (lengthEl2) formData.append("length", lengthEl2.value);
+      var widthEl2 = document.getElementById("edit-width");
+      if (widthEl2) formData.append("width", widthEl2.value);
+      var diameterEl2 = document.getElementById("edit-diameter");
+      if (diameterEl2) formData.append("diameter", diameterEl2.value);
+
       // Validación mínima
       if (
         !formData.get("product_id") ||
@@ -912,3 +974,6 @@ document.addEventListener("DOMContentLoaded", function () {
       });
     });
 });
+
+document.getElementById;
+document.getElementById("edit-product-id");
