@@ -197,13 +197,15 @@ document.addEventListener("DOMContentLoaded", function () {
           }
           const version = row.image_version || Date.now();
           const src = BASE_URL + row.image_url + "?v=" + version;
+          // REEMPLAZA SOLO EL "return" DE ESA FUNCIÓN FORMATTER
           return `<div class="d-flex justify-content-center">
-                <img src="${src}"
-                     style="max-height:40px; max-width:40px; border-radius:6px; object-fit:cover;"
-                     alt="Imagen"
-                     loading="lazy"
-                     class="border shadow-sm"/>
-              </div>`;
+      <img src="${src}"
+      data-src="${src}"
+      style="max-height:40px; max-width:40px; border-radius:6px; object-fit:cover; cursor:pointer;"
+      alt="Imagen"
+       loading="lazy"
+       class="border shadow-sm product-thumb"/>
+     </div>`;
         },
       },
       {
@@ -273,12 +275,14 @@ document.addEventListener("DOMContentLoaded", function () {
             // --- LÍNEAS SOLICITADAS: rellenar inputs de medidas y peso ---
             // Asegúrate de que los elementos existan en el modal (IDs mostrados abajo)
             // === CAMPOS NUEVOS (EDIT) ===
-            document.getElementById("edit-sale-price").value = rowData.sale_price ?? "";
+            document.getElementById("edit-sale-price").value =
+              rowData.sale_price ?? "";
             document.getElementById("edit-weight").value = rowData.weight ?? "";
             document.getElementById("edit-height").value = rowData.height ?? "";
             document.getElementById("edit-length").value = rowData.length ?? "";
             document.getElementById("edit-width").value = rowData.width ?? "";
-            document.getElementById("edit-diameter").value = rowData.diameter ?? "";
+            document.getElementById("edit-diameter").value =
+              rowData.diameter ?? "";
 
             // ----------------------------------------------------------------
 
@@ -318,6 +322,38 @@ document.addEventListener("DOMContentLoaded", function () {
       // row.getElement().style.backgroundColor = "#f8f9fa";
     },
   });
+
+
+  // --- Preview imagen: al hacer click en miniatura de la tabla abre #imagePreviewModal ---
+(function setupImagePreviewFromTable() {
+  const tableContainer = document.querySelector("#products-table");
+  const previewModalEl = document.getElementById("imagePreviewModal");
+  const previewImg = document.getElementById("imagePreviewModalImg");
+
+  if (!tableContainer) return;
+  if (!previewModalEl || !previewImg) {
+    console.warn("Modal de imagen no encontrado. Agrega #imagePreviewModal y #imagePreviewModalImg en la vista de lista.");
+    return;
+  }
+
+  tableContainer.addEventListener("click", function (e) {
+    const clicked = e.target.closest(".product-thumb");
+    if (!clicked) return;
+    const src = clicked.dataset.src || clicked.getAttribute("src");
+    if (!src) return;
+
+    previewImg.src = src + (src.includes("?") ? "&" : "?") + "v=" + Date.now();
+    previewImg.alt = clicked.alt || "Imagen del producto";
+
+    const modal = new bootstrap.Modal(previewModalEl);
+    modal.show();
+  });
+})();
+
+
+
+
+
 
   // CSS mejorado para scroll horizontal funcional
   // CSS mejorado para scroll horizontal funcional

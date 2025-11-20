@@ -20,8 +20,7 @@ require_once __DIR__ . '/../../models/Database.php';
 try {
   $pdo = (new Database())->getConnection();
 
-  $stmt = $pdo->prepare("
-    SELECT 
+  $stmt = $pdo->prepare("\n    SELECT 
         product_id,
         product_code,
         barcode,
@@ -128,8 +127,7 @@ require_once __DIR__ . '/../partials/layouts/lateral_menu_products.php';
           <ul class="nav flex-column">
             <?php foreach ($menuItems as $route => $item): ?>
               <li class="nav-item mb-2">
-                <a class="nav-link text-body d-flex align-items-center px-3 py-2 rounded-3 <?= $segment === $route ? 'active bg-primary text-white' : '' ?>"
-                  href="<?= BASE_URL . $route ?>">
+                <a class="nav-link text-body d-flex align-items-center px-3 py-2 rounded-3 <?= $segment === $route ? 'active bg-primary text-white' : '' ?>" href="<?= BASE_URL . $route ?>">
                   <i class="bi bi-<?= $item['icon'] ?> me-3"></i><?= $item['label'] ?>
                 </a>
               </li>
@@ -169,14 +167,11 @@ require_once __DIR__ . '/../partials/layouts/lateral_menu_products.php';
               <?php endif; ?>
             </div>
 
-
-
-
             <!-- Info -->
             <div class="col-md-7 p-4">
               <div class="mb-4">
                 <h5 class="text-primary"><i class="bi bi-file-text me-2"></i>Descripción</h5>
-                <p class="text-muted"><?= nl2br(htmlspecialchars($product['product_description'])) ?></p>
+                <p id="detail-description" class="text-muted"><?= nl2br(htmlspecialchars($product['product_description'])) ?></p>
               </div>
 
               <div class="row g-3 mb-4">
@@ -210,8 +205,7 @@ require_once __DIR__ . '/../partials/layouts/lateral_menu_products.php';
             <div class="card shadow-sm border-0 rounded-4">
               <div class="card-header bg-body py-3">
                 <h5 class="mb-0 fw-bold">
-                  <i class="bi bi-info-circle text-primary me-2"></i>
-                  Información Detallada
+                  <i class="bi bi-info-circle text-primary me-2"></i> Información Detallada
                 </h5>
               </div>
               <div class="card-body p-0">
@@ -235,7 +229,7 @@ require_once __DIR__ . '/../partials/layouts/lateral_menu_products.php';
                               </div>
                               <div>
                                 <small class="text-muted d-block">Código de Barras</small>
-                                <span class="fw-semibold"><?= htmlspecialchars($product['barcode']) ?></span>
+                                <span id="detail-barcode" class="fw-semibold"><?= htmlspecialchars($product['barcode']) ?></span>
                               </div>
                             </div>
 
@@ -245,7 +239,7 @@ require_once __DIR__ . '/../partials/layouts/lateral_menu_products.php';
                               </div>
                               <div>
                                 <small class="text-muted d-block">Ubicación</small>
-                                <span class="fw-semibold"><?= htmlspecialchars($product['location']) ?></span>
+                                <span id="detail-location" class="fw-semibold"><?= htmlspecialchars($product['location']) ?></span>
                               </div>
                             </div>
                           </div>
@@ -276,7 +270,6 @@ require_once __DIR__ . '/../partials/layouts/lateral_menu_products.php';
                     </div>
                   </div>
 
-                  <!-- Precios y ventas -->
                   <!-- Precios y ventas -->
                   <div class="accordion-item">
                     <h2 class="accordion-header">
@@ -320,7 +313,6 @@ require_once __DIR__ . '/../partials/layouts/lateral_menu_products.php';
                       </div>
                     </div>
                   </div>
-
 
                   <!-- Dimensiones y peso -->
                   <div class="accordion-item">
@@ -569,6 +561,35 @@ require_once __DIR__ . '/../partials/layouts/lateral_menu_products.php';
       if (img) img.src = `${BASE_URL}${u.image_url}?v=${Date.now()}`;
     }
 
+    // --- Actualizar Código de Barras ---
+    const detailBarcode = document.getElementById('detail-barcode');
+    if (detailBarcode) {
+      const newBarcode = (typeof u.barcode !== 'undefined' && u.barcode !== null && u.barcode !== '') 
+                         ? u.barcode 
+                         : (form["barcode"]?.value ?? '');
+      detailBarcode.textContent = newBarcode;
+    }
+
+    // --- Actualizar Ubicación ---
+    const detailLocation = document.getElementById('detail-location');
+    if (detailLocation) {
+      const newLocation = (typeof u.location !== 'undefined' && u.location !== null && u.location !== '')
+                          ? u.location
+                          : (form["location"]?.value ?? '');
+      detailLocation.textContent = newLocation;
+    }
+
+    // --- Actualizar Descripción ---
+    const detailDescription = document.getElementById('detail-description');
+    if (detailDescription) {
+      const newDesc = (typeof u.product_description !== 'undefined' && u.product_description !== null)
+                      ? u.product_description
+                      : (form["product_description"]?.value ?? '');
+
+      // mantener saltos de línea en HTML
+      detailDescription.innerHTML = newDesc.replace(/\n/g, "<br>");
+    }
+
     // --- ACTUALIZAR INFORMACIÓN DETALLADA (precio venta, margen, dimensiones, peso) ---
     // Precio base
     const detailPriceBase = document.getElementById("detail-price-base");
@@ -603,7 +624,6 @@ require_once __DIR__ . '/../partials/layouts/lateral_menu_products.php';
       if (value === null || typeof value === 'undefined' || value === '') {
         el.textContent = 'N/A';
       } else {
-        // si es numérico, formatear con hasta 4 decimales
         const n = parseFloat(value);
         el.textContent = (!isNaN(n)) ? n.toString() + suffix : String(value) + suffix;
       }
@@ -625,9 +645,6 @@ require_once __DIR__ . '/../partials/layouts/lateral_menu_products.php';
         detailWeight.textContent = (!isNaN(w)) ? `${w} kg` : `${weightVal} kg`;
       }
     }
-
-    // Si quieres volver a enganchar el preview de imagen después de actualizar:
-    // attachZoomListeners(); // (si tienes esa función disponible globalmente)
 
     toast("Producto actualizado correctamente.");
   } catch (err) {
