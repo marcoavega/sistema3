@@ -25,7 +25,7 @@ require_once __DIR__ . '/../../models/Database.php';
 $pdo = (new Database())->getConnection();
 
 // Mantener la misma inclusión del lateral que usa dashboard
-require_once __DIR__ . '/../partials/layouts/lateral_menu_dashboard.php';
+
 ?>
 
 <!-- Contenedor principal — idéntico a dashboard -->
@@ -33,29 +33,8 @@ require_once __DIR__ . '/../partials/layouts/lateral_menu_dashboard.php';
     <div class="row g-0">
 
         <!-- Menú lateral para pantallas medianas y grandes (sin cambiar, muestra "Sistema") -->
-        <nav class="col-md-2 d-none d-md-block sidebar min-vh-100">
-            <div class="pt-4 px-3">
-                <div class="text-center mb-4">
-                    <div class="rounded-circle d-inline-flex align-items-center justify-content-center dashboard-nav-styles">
-                        <i class="bi bi-speedometer2 text-primary fs-3"></i>
-                    </div>
-                    <h6 class="mt-2 mb-0">Sistema</h6>
-                </div>
-
-                <ul class="nav flex-column">
-                    <?php foreach ($menuItems as $route => $item): ?>
-                        <li class="nav-item mb-2">
-                            <a
-                                class="nav-link d-flex align-items-center px-3 py-2 rounded-3 <?= $segment === $route ? 'bg-primary text-white fw-bold' : 'text-body' ?> dashboard-a-li-ul-styles"
-                                href="<?= BASE_URL . $route ?>">
-                                <i class="bi bi-<?= $item['icon'] ?> me-3 fs-5"></i>
-                                <span class="fw-medium"><?= $item['label'] ?></span>
-                            </a>
-                        </li>
-                    <?php endforeach; ?>
-                </ul>
-            </div>
-        </nav>
+         <!-- Menú lateral para pantallas medianas y grandes -->
+       <?php require_once __DIR__ . '/../partials/layouts/laterals_menus/lateral_menu_dashboard.php'; ?>
 
         <!-- Contenido principal (mismo diseño que dashboard) -->
         <main class="col-12 col-md-10">

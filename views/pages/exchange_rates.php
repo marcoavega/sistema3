@@ -17,6 +17,12 @@ $segment = explode('/', trim($uri, '/'))[0];
 $username = htmlspecialchars($_SESSION['user']['username']);
 $activeMenu = 'settings';
 
+// -------------------------------------------------
+// Importa el archivo que DEFINE $menuItems (global)
+// -------------------------------------------------
+// Asegúrate de que lateral_menu_dashboard.php exista y
+// defina $menuItems = [ 'dashboard'=>..., 'settings'=>..., ... ]
+
 // -----------------------
 // POST handlers (crear / borrar) - PRG usando flash en session
 // -----------------------
@@ -122,34 +128,10 @@ $rates = $ratesStmt->fetchAll(PDO::FETCH_ASSOC);
 <div class="container-fluid m-0 p-0 min-vh-100" data-bs-theme="auto">
   <div class="row g-0">
 
-    <!-- === NAV LATERAL (igual estilo que dashboard) === -->
-    <nav class="col-md-2 d-none d-md-block sidebar min-vh-100">
-      <div class="pt-4 px-3">
-        <div class="text-center mb-4">
-          <div class="rounded-circle d-inline-flex align-items-center justify-content-center dashboard-nav-styles">
-            <i class="bi bi-speedometer2 text-primary fs-3"></i>
-          </div>
-          <h6 class="mt-2 mb-0">Sistema</h6>
-        </div>
-
-        <ul class="nav flex-column">
-          <li class="nav-item mb-2">
-            <a class="nav-link d-flex align-items-center px-3 py-2 rounded-3 <?= $segment === 'dashboard' ? 'bg-primary text-white fw-bold' : 'text-body' ?>" href="<?= BASE_URL ?>dashboard">
-              <i class="bi bi-house-door-fill me-3 fs-5"></i>
-              <span class="fw-medium">Panel de Control</span>
-            </a>
-          </li>
-
-          <li class="nav-item mb-2">
-            <a class="nav-link d-flex align-items-center px-3 py-2 rounded-3 <?= $segment === 'settings' ? 'bg-primary text-white fw-bold' : 'text-body' ?>" href="<?= BASE_URL ?>settings">
-              <i class="bi bi-gear me-3 fs-5"></i>
-              <span class="fw-medium">Configuración</span>
-            </a>
-          </li>
-        </ul>
-      </div>
-    </nav>
-    <!-- === FIN NAV LATERAL === -->
+    <!-- NAV LATERAL: generado desde $menuItems (igual que en dashboard) -->
+    <!-- Menú lateral para pantallas medianas y grandes -->
+    <?php require_once __DIR__ . '/../partials/layouts/laterals_menus/lateral_menu_dashboard.php'; ?>
+    <!-- FIN NAV LATERAL -->
 
     <!-- Contenido principal -->
     <main class="col-12 col-md-10">

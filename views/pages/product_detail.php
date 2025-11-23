@@ -63,35 +63,15 @@ try {
 
 $username = htmlspecialchars($_SESSION['user']['username']);
 $activeMenu = 'list_product';
-require_once __DIR__ . '/../partials/layouts/lateral_menu_products.php';
+
+
 ?>
 
 <div class="container-fluid m-0 p-0 min-vh-100" data-bs-theme="auto">
   <div class="row g-0">
 
     <!-- Barra lateral -->
-    <nav class="col-md-2 d-none d-md-block sidebar min-vh-100">
-      <div class="pt-4 px-3">
-        <div class="text-center mb-4">
-          <div class="rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
-            <i class="bi bi-box-seam text-primary fs-3"></i>
-          </div>
-          <h6 class="mt-2 mb-0">Inventario</h6>
-        </div>
-
-        <ul class="nav flex-column">
-          <?php foreach ($menuItems as $route => $item): ?>
-            <li class="nav-item mb-2">
-              <a class="nav-link d-flex align-items-center px-3 py-2 rounded-3 <?= isset($activeMenu) && $activeMenu === $route ? 'bg-primary text-white fw-bold' : 'text-body' ?>"
-                href="<?= BASE_URL . $route ?>">
-                <i class="bi bi-<?= $item['icon'] ?> me-3 fs-5"></i>
-                <span class="fw-medium"><?= $item['label'] ?></span>
-              </a>
-            </li>
-          <?php endforeach; ?>
-        </ul>
-      </div>
-    </nav>
+    <?php require_once __DIR__ . '/../partials/layouts/laterals_menus/lateral_menu_products.php'; ?>
 
     <!-- Contenido principal -->
     <main class="col-12 col-md-10">

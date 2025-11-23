@@ -26,7 +26,7 @@ define('DB_PASS',''); // Contraseña del usuario de la base de datos (en producc
 define('APP_SESSION_NAME','sistema003_session'); 
 // Define el nombre de la cookie de sesión, usado para evitar colisiones con otras aplicaciones en el mismo servidor.
 
-define('APP_SESSION_TIME','3600'); // 1 hora (3600 segundos) 
+define('APP_SESSION_TIME','36000'); // 10 horas (36000 segundos) 
 // Establece la duración de la sesión, tras este tiempo inactivo el usuario debe volver a autenticarse.
 
 define('PRODUCT_IMAGE_DIR', __DIR__ . '/../../assets/images/products/');
