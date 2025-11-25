@@ -6,10 +6,14 @@ if (!isset($_SESSION['user'])) {
   exit();
 }
 
-ob_start();
+require_once __DIR__ . '/../../controllers/ExchangeRatesController.php';
 
-require_once __DIR__ . '/../../models/Database.php';
-$pdo = (new Database())->getConnection();
+$controller = new ExchangeRatesController();
+$data = $controller->getViewData();
+
+$currencies = $data['currencies'];
+$lastRates  = $data['lastRates'];
+$rates      = $data['rates'];
 
 $uri = $_GET['url'] ?? 'exchange_rates';
 $segment = explode('/', trim($uri, '/'))[0];
@@ -17,123 +21,13 @@ $segment = explode('/', trim($uri, '/'))[0];
 $username = htmlspecialchars($_SESSION['user']['username']);
 $activeMenu = 'settings';
 
-// -------------------------------------------------
-// Importa el archivo que DEFINE $menuItems (global)
-// -------------------------------------------------
-// Asegúrate de que lateral_menu_dashboard.php exista y
-// defina $menuItems = [ 'dashboard'=>..., 'settings'=>..., ... ]
-
-// -----------------------
-// POST handlers (crear / borrar) - PRG usando flash en session
-// -----------------------
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-  $action = $_POST['action'] ?? '';
-  try {
-    if ($action === 'create_currency') {
-      $code = strtoupper(trim($_POST['currency_code'] ?? ''));
-      $name = trim($_POST['currency_name'] ?? '');
-      $country = trim($_POST['country'] ?? '');
-      if (!$code || !$name || !$country) throw new Exception('Faltan campos para moneda.');
-      $stmt = $pdo->prepare("INSERT INTO currencies (currency_code, currency_name, country) VALUES (?, ?, ?)");
-      $stmt->execute([$code, $name, $country]);
-      $_SESSION['flash_success'] = 'Moneda creada con éxito.';
-      header("Location: " . BASE_URL . "exchange_rates");
-      exit();
-    }
-
-    if ($action === 'create_rate') {
-      $currency_id = (int)($_POST['currency_id'] ?? 0);
-      $rate = $_POST['rate'] ?? null;
-      $rate_date = $_POST['rate_date'] ?? null;
-      $notes = $_POST['notes'] ?? null;
-      if (!$currency_id || $rate === null || !$rate_date) throw new Exception('Faltan campos para tipo de cambio.');
-      $stmt = $pdo->prepare("INSERT INTO exchange_rates (currency_id, rate, rate_date, notes) VALUES (?, ?, ?, ?)");
-      $stmt->execute([$currency_id, $rate, $rate_date, $notes]);
-      $_SESSION['flash_success'] = 'Tipo de cambio registrado.';
-      header("Location: " . BASE_URL . "exchange_rates");
-      exit();
-    }
-
-    if ($action === 'delete_currency') {
-      $id = (int)($_POST['currency_id'] ?? 0);
-      if (!$id) throw new Exception('ID moneda inválido.');
-      $stmt = $pdo->prepare("DELETE FROM currencies WHERE currency_id = ?");
-      $stmt->execute([$id]);
-      $_SESSION['flash_success'] = 'Moneda eliminada.';
-      header("Location: " . BASE_URL . "exchange_rates");
-      exit();
-    }
-
-    if ($action === 'delete_rate') {
-      $id = (int)($_POST['rate_id'] ?? 0);
-      if (!$id) throw new Exception('ID rate inválido.');
-      $stmt = $pdo->prepare("DELETE FROM exchange_rates WHERE rate_id = ?");
-      $stmt->execute([$id]);
-      $_SESSION['flash_success'] = 'Registro de tipo de cambio eliminado.';
-      header("Location: " . BASE_URL . "exchange_rates");
-      exit();
-    }
-  } catch (PDOException $pe) {
-    if ($pe->getCode() == 23000) {
-      $_SESSION['flash_error'] = 'Error de base de datos: registro duplicado o restricción violada.';
-    } else {
-      $_SESSION['flash_error'] = 'Error de base de datos: ' . $pe->getMessage();
-    }
-    header("Location: " . BASE_URL . "exchange_rates");
-    exit();
-  } catch (Exception $e) {
-    $_SESSION['flash_error'] = $e->getMessage();
-    header("Location: " . BASE_URL . "exchange_rates");
-    exit();
-  }
-}
-
-// -----------------------
-// Datos
-// -----------------------
-$currencies = $pdo->query("SELECT currency_id, currency_code, currency_name, country FROM currencies ORDER BY currency_code")->fetchAll(PDO::FETCH_ASSOC);
-
-// Último tipo por moneda (para mostrar paridad actual al lado de la moneda)
-$lastRates = [];
-try {
-  $lastRatesStmt = $pdo->prepare("
-    SELECT er.currency_id, er.rate, er.rate_date, er.created_at
-    FROM exchange_rates er
-    JOIN (
-      SELECT currency_id, MAX(created_at) AS max_created
-      FROM exchange_rates
-      GROUP BY currency_id
-    ) grouped ON grouped.currency_id = er.currency_id AND grouped.max_created = er.created_at
-  ");
-  $lastRatesStmt->execute();
-  $lastRatesRaw = $lastRatesStmt->fetchAll(PDO::FETCH_ASSOC);
-  foreach ($lastRatesRaw as $lr) {
-    $lastRates[$lr['currency_id']] = $lr;
-  }
-} catch (Exception $e) {
-  error_log("No se pudo obtener lastRates: " . $e->getMessage());
-}
-
-$ratesStmt = $pdo->prepare("
-  SELECT er.rate_id, er.currency_id, er.rate, er.rate_date, er.notes, er.created_at, c.currency_code, c.currency_name
-  FROM exchange_rates er
-  JOIN currencies c ON c.currency_id = er.currency_id
-  ORDER BY er.rate_date DESC, er.created_at DESC
-  LIMIT 500
-");
-$ratesStmt->execute();
-$rates = $ratesStmt->fetchAll(PDO::FETCH_ASSOC);
+ob_start();
 ?>
 
 <div class="container-fluid m-0 p-0 min-vh-100" data-bs-theme="auto">
   <div class="row g-0">
-
-    <!-- NAV LATERAL: generado desde $menuItems (igual que en dashboard) -->
-    <!-- Menú lateral para pantallas medianas y grandes -->
     <?php require_once __DIR__ . '/../partials/layouts/laterals_menus/lateral_menu_dashboard.php'; ?>
-    <!-- FIN NAV LATERAL -->
 
-    <!-- Contenido principal -->
     <main class="col-12 col-md-10">
       <div class="bg-body shadow-sm border-bottom">
         <div class="container-fluid px-4 py-3 d-flex justify-content-between align-items-center">
@@ -157,7 +51,7 @@ $rates = $ratesStmt->fetchAll(PDO::FETCH_ASSOC);
       </div>
 
       <div class="container-fluid px-4 py-4">
-        <!-- Mensajes flash en sesión (limpios en la URL) -->
+        <!-- Flash messages server-side (si las hay) -->
         <?php if (!empty($_SESSION['flash_success'])): ?>
           <div class="alert alert-success py-2"><?= htmlspecialchars($_SESSION['flash_success']) ?></div>
           <?php unset($_SESSION['flash_success']); ?>
@@ -178,31 +72,28 @@ $rates = $ratesStmt->fetchAll(PDO::FETCH_ASSOC);
                 </button>
               </div>
               <div class="card-body p-2">
-                <ul class="list-group list-group-flush">
-                  <?php foreach ($currencies as $c): ?>
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                      <div>
-                        <strong><?= htmlspecialchars($c['currency_code']) ?></strong>
-                        <div class="small text-muted"><?= htmlspecialchars($c['currency_name']) ?> — <?= htmlspecialchars($c['country']) ?></div>
-                      </div>
-                      <div class="d-flex gap-2 align-items-center">
-                        <?php if (!empty($lastRates[$c['currency_id']])): ?>
-                          <div class="text-end me-2 small">
-                            <div class="fw-bold"><?= number_format($lastRates[$c['currency_id']]['rate'], 6) ?></div>
-                            <div class="text-muted"><?= htmlspecialchars($lastRates[$c['currency_id']]['rate_date']) ?></div>
-                          </div>
-                        <?php else: ?>
-                          <div class="text-end me-2 small text-muted">Sin paridad</div>
-                        <?php endif; ?>
-                        <form method="post" onsubmit="return confirm('Eliminar moneda y sus tipos de cambio?');">
-                          <input type="hidden" name="action" value="delete_currency">
-                          <input type="hidden" name="currency_id" value="<?= $c['currency_id'] ?>">
-                          <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar moneda"><i class="bi bi-trash"></i></button>
-                        </form>
-                      </div>
-                    </li>
-                  <?php endforeach; ?>
-                  <?php if (empty($currencies)): ?>
+                <ul id="currencies-list" class="list-group list-group-flush">
+                  <?php if (!empty($currencies)): ?>
+                    <?php foreach ($currencies as $c): ?>
+                      <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                          <strong><?= htmlspecialchars($c['currency_code']) ?></strong>
+                          <div class="small text-muted"><?= htmlspecialchars($c['currency_name']) ?> — <?= htmlspecialchars($c['country']) ?></div>
+                        </div>
+                        <div class="d-flex gap-2 align-items-center">
+                          <?php if (!empty($lastRates[$c['currency_id']])): ?>
+                            <div class="text-end me-2 small">
+                              <div class="fw-bold"><?= number_format($lastRates[$c['currency_id']]['rate'], 6) ?></div>
+                              <div class="text-muted"><?= htmlspecialchars($lastRates[$c['currency_id']]['rate_date']) ?></div>
+                            </div>
+                          <?php else: ?>
+                            <div class="text-end me-2 small text-muted">Sin paridad</div>
+                          <?php endif; ?>
+                          <button class="btn btn-sm btn-outline-danger btn-delete-currency" data-id="<?= $c['currency_id'] ?>"><i class="bi bi-trash"></i></button>
+                        </div>
+                      </li>
+                    <?php endforeach; ?>
+                  <?php else: ?>
                     <li class="list-group-item text-muted">No hay monedas registradas.</li>
                   <?php endif; ?>
                 </ul>
@@ -233,24 +124,21 @@ $rates = $ratesStmt->fetchAll(PDO::FETCH_ASSOC);
                         <th class="text-end">Acciones</th>
                       </tr>
                     </thead>
-                    <tbody>
-                      <?php foreach ($rates as $r): ?>
-                        <tr>
-                          <td><?= htmlspecialchars($r['rate_date']) ?></td>
-                          <td><?= htmlspecialchars($r['currency_code']) ?> — <?= htmlspecialchars($r['currency_name']) ?></td>
-                          <td class="fw-bold">$<?= number_format($r['rate'], 6) ?></td>
-                          <td><?= htmlspecialchars($r['notes']) ?></td>
-                          <td class="small text-muted"><?= htmlspecialchars($r['created_at']) ?></td>
-                          <td class="text-end">
-                            <form method="post" class="d-inline" onsubmit="return confirm('Eliminar este registro?');">
-                              <input type="hidden" name="action" value="delete_rate">
-                              <input type="hidden" name="rate_id" value="<?= $r['rate_id'] ?>">
-                              <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
-                            </form>
-                          </td>
-                        </tr>
-                      <?php endforeach; ?>
-                      <?php if (empty($rates)): ?>
+                    <tbody id="rates-tbody">
+                      <?php if (!empty($rates)): ?>
+                        <?php foreach ($rates as $r): ?>
+                          <tr>
+                            <td><?= htmlspecialchars($r['rate_date']) ?></td>
+                            <td><?= htmlspecialchars($r['currency_code']) ?> — <?= htmlspecialchars($r['currency_name']) ?></td>
+                            <td class="fw-bold">$<?= number_format($r['rate'], 6) ?></td>
+                            <td><?= htmlspecialchars($r['notes']) ?></td>
+                            <td class="small text-muted"><?= htmlspecialchars($r['created_at']) ?></td>
+                            <td class="text-end">
+                              <button class="btn btn-sm btn-outline-danger btn-delete-rate" data-id="<?= $r['rate_id'] ?>"><i class="bi bi-trash"></i></button>
+                            </td>
+                          </tr>
+                        <?php endforeach; ?>
+                      <?php else: ?>
                         <tr><td colspan="6" class="text-center text-muted py-4">No hay registros de tipo de cambio.</td></tr>
                       <?php endif; ?>
                     </tbody>
@@ -267,82 +155,15 @@ $rates = $ratesStmt->fetchAll(PDO::FETCH_ASSOC);
   </div>
 </div>
 
-<!-- Modal: agregar moneda -->
-<div class="modal fade" id="modalAddCurrency" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-sm modal-dialog-centered">
-    <div class="modal-content">
-      <form method="post" id="formAddCurrency">
-        <input type="hidden" name="action" value="create_currency">
-        <div class="modal-header">
-          <h5 class="modal-title">Nueva Moneda</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          <div class="mb-2">
-            <label class="form-label small">Código (ej. USD)</label>
-            <input required class="form-control" name="currency_code" maxlength="10" placeholder="USD">
-          </div>
-          <div class="mb-2">
-            <label class="form-label small">Nombre</label>
-            <input required class="form-control" name="currency_name" maxlength="100" placeholder="Dólar estadounidense">
-          </div>
-          <div class="mb-2">
-            <label class="form-label small">País</label>
-            <input required class="form-control" name="country" maxlength="100" placeholder="Estados Unidos">
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Cancelar</button>
-          <button class="btn btn-primary" type="submit">Guardar</button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
-
-<!-- Modal: agregar tipo de cambio -->
-<div class="modal fade" id="modalAddRate" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-md modal-dialog-centered">
-    <div class="modal-content">
-      <form method="post" id="formAddRate">
-        <input type="hidden" name="action" value="create_rate">
-        <div class="modal-header">
-          <h5 class="modal-title">Nuevo Tipo de Cambio</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          <div class="mb-2">
-            <label class="form-label small">Moneda</label>
-            <select name="currency_id" class="form-select" required>
-              <option value="">Selecciona...</option>
-              <?php foreach ($currencies as $c): ?>
-                <option value="<?= $c['currency_id'] ?>"><?= htmlspecialchars($c['currency_code']) ?> — <?= htmlspecialchars($c['currency_name']) ?></option>
-              <?php endforeach; ?>
-            </select>
-          </div>
-          <div class="mb-2">
-            <label class="form-label small">Fecha</label>
-            <input type="date" name="rate_date" class="form-control" required value="<?= date('Y-m-d') ?>">
-          </div>
-          <div class="mb-2">
-            <label class="form-label small">Tipo de cambio</label>
-            <input type="number" step="0.000001" name="rate" class="form-control" required placeholder="ej. 18.500000">
-          </div>
-          <div class="mb-2">
-            <label class="form-label small">Notas (opcional)</label>
-            <textarea name="notes" class="form-control" rows="2"></textarea>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Cancelar</button>
-          <button class="btn btn-primary" type="submit">Guardar</button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
-
 <?php
+
+include __DIR__ . '/../partials/modals/exchange_rates/add_currency_modal.php';
+include __DIR__ . '/../partials/modals/exchange_rates/add_rate_modal.php';
+
 $content = ob_get_clean();
 include __DIR__ . '/../partials/layouts/navbar.php';
+
 ?>
+
+<!-- carga el JS AJAX -->
+<script src="<?= BASE_URL ?>assets/js/ajax/exchange_rates.js"></script>
