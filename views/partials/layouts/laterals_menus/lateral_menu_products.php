@@ -6,13 +6,7 @@
 $menuItems = [
   'inventory' => ['icon' => 'box-seam', 'label' => 'Inventario', 'sidebarTitle' => 'Inventario'],
   'list_product' => [ 'icon' => 'list-ul', 'label' => 'Listado de Productos', 'sidebarTitle' => 'Listado de Productos'],
-  'submenu' => [
-      'exchange_rates' => [
-        'icon'  => '',
-        'label' => 'Tipo de Cambio'
-      ],
-  // puedes agregar más items aquí (ej. 'inventory' => [...])
-]];
+];
 
 // Determinar segmento actual de forma robusta:
 // Si en la página ya defines $segment antes de incluir este archivo, se respeta.

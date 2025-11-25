@@ -1,21 +1,41 @@
 <?php
-// Archivo: api/warehouses.php
+// api/warehouses.php
 header('Content-Type: application/json; charset=utf-8');
 
-// Inicializar sesión (si tu sistema lo requiere)
+// sesión
 if (session_status() === PHP_SESSION_NONE) session_start();
 
 require_once __DIR__ . '/../models/Database.php';
 $pdo = (new Database())->getConnection();
 
-// Restricción de acceso: opcional (mantener si quieres que solo admin=1 maneje)
-// if (!isset($_SESSION['user']) || $_SESSION['user']['level_user'] != 1) {
-//     http_response_code(403);
-//     echo json_encode(['success' => false, 'message' => 'Acceso denegado']);
-//     exit;
-// }
-
+// determinar acción (soporta GET/POST y body JSON)
 $action = $_GET['action'] ?? ($_POST['action'] ?? 'list');
+
+
+// helper: obtener input (POST o raw JSON)
+$input = $_POST;
+if (empty($input)) {
+    $raw = file_get_contents('php://input');
+    if ($raw) {
+        $json = json_decode($raw, true);
+        if (json_last_error() === JSON_ERROR_NONE) $input = $json;
+    }
+}
+
+// helper: registrar log directamente en la tabla user_logs
+function register_log(PDO $pdo, $userId, $actionText) {
+    try {
+        // Ajusta los nombres de columnas si tu tabla es distinta
+        $stmt = $pdo->prepare("INSERT INTO user_logs (user_id, action, `timestamp`) VALUES (:uid, :act, NOW())");
+        $stmt->execute([':uid' => $userId ?? 0, ':act' => $actionText]);
+    } catch (Throwable $t) {
+        // no interrumpir el flujo por un fallo en logging — solo lo dejamos en error_log PHP
+        error_log("register_log error: " . $t->getMessage());
+    }
+}
+
+// usuario que realiza la acción (suponiendo que en session tengas user_id)
+$user_id = $_SESSION['user']['user_id'] ?? $_SESSION['user']['id'] ?? null;
 
 try {
     if ($action === 'list') {
@@ -25,17 +45,6 @@ try {
         exit;
     }
 
-    // recibir datos (POST). soporte x-www-form-urlencoded o JSON.
-    $input = $_POST;
-    // si JSON raw
-    if (empty($input)) {
-        $raw = file_get_contents('php://input');
-        if ($raw) {
-            $json = json_decode($raw, true);
-            if (json_last_error() === JSON_ERROR_NONE) $input = $json;
-        }
-    }
-
     if ($action === 'create') {
         $name = trim($input['name'] ?? '');
         if ($name === '') {
@@ -43,8 +52,12 @@ try {
             exit;
         }
         $stmt = $pdo->prepare("INSERT INTO warehouses (name, created_at) VALUES (:name, NOW())");
-        $stmt->execute(['name' => $name]);
+        $stmt->execute([':name' => $name]);
         $id = $pdo->lastInsertId();
+
+        // registrar log
+        register_log($pdo, $user_id, "Creó almacén id {$id}: {$name}");
+
         $stmt = $pdo->prepare("SELECT warehouse_id AS id, name, created_at, updated_at FROM warehouses WHERE warehouse_id = :id LIMIT 1");
         $stmt->execute(['id' => $id]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -59,8 +72,18 @@ try {
             echo json_encode(['success' => false, 'message' => 'ID y nombre son obligatorios']);
             exit;
         }
+
+        // obtener nombre anterior (para log)
+        $q = $pdo->prepare("SELECT name FROM warehouses WHERE warehouse_id = :id LIMIT 1");
+        $q->execute([':id' => $id]);
+        $oldName = $q->fetchColumn();
+
         $stmt = $pdo->prepare("UPDATE warehouses SET name = :name, updated_at = NOW() WHERE warehouse_id = :id");
         $stmt->execute(['name' => $name, 'id' => $id]);
+
+        // registrar log
+        register_log($pdo, $user_id, "Actualizó almacén id {$id}: '{$oldName}' → '{$name}'");
+
         $stmt = $pdo->prepare("SELECT warehouse_id AS id, name, created_at, updated_at FROM warehouses WHERE warehouse_id = :id LIMIT 1");
         $stmt->execute(['id' => $id]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -74,13 +97,22 @@ try {
             echo json_encode(['success' => false, 'message' => 'ID inválido']);
             exit;
         }
+
+        // obtener nombre antes de borrar (para log)
+        $q = $pdo->prepare("SELECT name FROM warehouses WHERE warehouse_id = :id LIMIT 1");
+        $q->execute([':id' => $id]);
+        $oldName = $q->fetchColumn();
+
         $stmt = $pdo->prepare("DELETE FROM warehouses WHERE warehouse_id = :id");
         $stmt->execute(['id' => $id]);
+
+        // registrar log
+        register_log($pdo, $user_id, "Eliminó almacén id {$id}: '{$oldName}'");
+
         echo json_encode(['success' => true, 'deleted_id' => $id]);
         exit;
     }
 
-    // acción no reconocida
     echo json_encode(['success' => false, 'message' => 'Acción no válida: ' . htmlspecialchars($action)]);
 } catch (PDOException $e) {
     http_response_code(500);
