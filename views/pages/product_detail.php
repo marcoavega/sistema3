@@ -56,6 +56,63 @@ try {
     header("Location: " . BASE_URL . "product_not_found");
     exit();
   }
+
+  // --- OBTENER LISTA DE ALMACENES ---
+  try {
+    $whs = $pdo->query("SELECT warehouse_id, name FROM warehouses ORDER BY warehouse_id")->fetchAll(PDO::FETCH_ASSOC);
+  } catch (Exception $e) {
+    $whs = [];
+  }
+
+  // --- OBTENER STOCK POR ALMACÉN (si existe tabla) ---
+  try {
+    $table = null;
+    $warehouse_col_product = 'product_id';
+    $warehouse_col_warehouse = 'warehouse_id';
+
+    $res = $pdo->query("SHOW TABLES LIKE 'warehouse_stock'")->fetch(PDO::FETCH_NUM);
+    if ($res) {
+      $table = 'warehouse_stock';
+      // asumimos columnas product_id, warehouse_id, stock
+      $warehouse_col_product = 'product_id';
+      $warehouse_col_warehouse = 'warehouse_id';
+    } else {
+      $res2 = $pdo->query("SHOW TABLES LIKE 'product_stock'")->fetch(PDO::FETCH_NUM);
+      if ($res2) {
+        $table = 'product_stock';
+        $warehouse_col_product = 'product_id';
+        $warehouse_col_warehouse = 'warehouse_id';
+      }
+    }
+
+    if ($table) {
+      $sql = "
+        SELECT w.warehouse_id, w.name AS warehouse_name, COALESCE(s.stock, 0) AS stock
+        FROM warehouses w
+        LEFT JOIN {$table} s
+          ON s.{$warehouse_col_warehouse} = w.warehouse_id
+         AND s.{$warehouse_col_product} = :product_id
+        ORDER BY w.warehouse_id ASC
+      ";
+      $stock_stmt = $pdo->prepare($sql);
+      $stock_stmt->execute(['product_id' => $product_id]);
+      $warehouses_stock = $stock_stmt->fetchAll(PDO::FETCH_ASSOC);
+    } else {
+      // Si no hay tabla específica de stock, inicializamos con 0 por almacén (si hay almacenes)
+      $warehouses_stock = [];
+      foreach ($whs as $w) {
+        $warehouses_stock[] = [
+          'warehouse_id' => $w['warehouse_id'],
+          'warehouse_name' => $w['name'],
+          'stock' => 0
+        ];
+      }
+    }
+  } catch (PDOException $e) {
+    error_log("Error al obtener stock por almacén: " . $e->getMessage());
+    $warehouses_stock = [];
+  }
+
 } catch (PDOException $e) {
   echo "Error en la base de datos: " . $e->getMessage();
   exit();
@@ -385,6 +442,43 @@ $activeMenu = 'list_product';
                     </div>
                   </div>
 
+                  <!-- NUEVA SECCIÓN: Stock por Almacén -->
+                  <div class="accordion-item">
+                    <h2 class="accordion-header">
+                      <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#stockByWarehouse">
+                        <i class="bi bi-boxes me-2 text-primary"></i>
+                        Stock por Almacén
+                      </button>
+                    </h2>
+                    <div id="stockByWarehouse" class="accordion-collapse collapse" data-bs-parent="#productDetails">
+                      <div class="accordion-body">
+                        <div class="table-responsive">
+                          <table class="table table-sm table-bordered align-middle text-center mb-0">
+                            <thead class="table-dark">
+                              <tr>
+                                <th class="text-start">Almacén</th>
+                                <th>Stock</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <?php if (!empty($warehouses_stock)): ?>
+                                <?php foreach ($warehouses_stock as $ws): ?>
+                                  <tr data-warehouse-id="<?= intval($ws['warehouse_id']) ?>">
+                                    <td class="text-start fw-semibold"><?= htmlspecialchars($ws['warehouse_name']) ?></td>
+                                    <td class="fw-bold"><?= intval($ws['stock']) ?></td>
+                                  </tr>
+                                <?php endforeach; ?>
+                              <?php else: ?>
+                                <tr>
+                                  <td colspan="2">No hay datos de almacenes o stock.</td>
+                                </tr>
+                              <?php endif; ?>
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
 
                 </div>
               </div>
@@ -409,7 +503,6 @@ include __DIR__ . '/../partials/modals/modal_stock_transfer.php';
 
 <!-- JS: lógica de modales de stock -->
 <script src="<?= BASE_URL ?>assets/js/modals_stock.js"></script>
-
 
 <!-- SCRIPT -->
 <script>
@@ -746,7 +839,6 @@ include __DIR__ . '/../partials/modals/modal_stock_transfer.php';
     </div>
   </div>
 </div>
-
 
 <?php
 $content = ob_get_clean();
