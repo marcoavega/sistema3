@@ -5,7 +5,7 @@ if (session_status() === PHP_SESSION_NONE) session_start();
 <div class="modal fade" id="modalStockTransfer" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-sm modal-dialog-centered">
     <div class="modal-content">
-      <form id="formStockTransfer">
+      <form id="formStockTransfer" onsubmit="return false;">
         <input type="hidden" name="product_id" value="<?= intval($product['product_id']) ?>">
         <div class="modal-header">
           <h5 class="modal-title">Transferir entre almacenes</h5>
@@ -41,7 +41,7 @@ if (session_status() === PHP_SESSION_NONE) session_start();
         </div>
         <div class="modal-footer">
           <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Cancelar</button>
-          <button class="btn btn-info text-white" type="submit">
+          <button class="btn btn-info text-white js-submit-transfer" type="button" data-action="transfer">
             <span class="spinner-border spinner-border-sm d-none me-2" role="status" aria-hidden="true"></span>
             Transferir
           </button>

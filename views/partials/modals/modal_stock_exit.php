@@ -5,7 +5,7 @@ if (session_status() === PHP_SESSION_NONE) session_start();
 <div class="modal fade" id="modalStockExit" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-sm modal-dialog-centered">
     <div class="modal-content">
-      <form id="formStockExit">
+      <form id="formStockExit" onsubmit="return false;">
         <input type="hidden" name="product_id" value="<?= intval($product['product_id']) ?>">
         <div class="modal-header">
           <h5 class="modal-title">Salida de Stock</h5>
@@ -32,7 +32,7 @@ if (session_status() === PHP_SESSION_NONE) session_start();
         </div>
         <div class="modal-footer">
           <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Cancelar</button>
-          <button class="btn btn-danger" type="submit">
+          <button class="btn btn-danger js-submit-exit" type="button" data-action="exit">
             <span class="spinner-border spinner-border-sm d-none me-2" role="status" aria-hidden="true"></span>
             Registrar salida
           </button>

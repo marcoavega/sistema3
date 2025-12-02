@@ -461,19 +461,15 @@ $activeMenu = 'list_product';
                               </tr>
                             </thead>
                             <tbody>
-                              <?php if (!empty($warehouses_stock)): ?>
-                                <?php foreach ($warehouses_stock as $ws): ?>
-                                  <tr data-warehouse-id="<?= intval($ws['warehouse_id']) ?>">
-                                    <td class="text-start fw-semibold"><?= htmlspecialchars($ws['warehouse_name']) ?></td>
-                                    <td class="fw-bold"><?= intval($ws['stock']) ?></td>
-                                  </tr>
-                                <?php endforeach; ?>
-                              <?php else: ?>
-                                <tr>
-                                  <td colspan="2">No hay datos de almacenes o stock.</td>
-                                </tr>
-                              <?php endif; ?>
-                            </tbody>
+  <?php foreach ($warehouses_stock as $ws): ?>
+    <tr data-warehouse-id="<?= intval($ws['warehouse_id']) ?>">
+      <td class="fw-semibold"><?= htmlspecialchars($ws['warehouse_name']) ?></td>
+      <!-- agregar data-stock-cell y clase para buscarlo desde JS -->
+      <td data-stock-cell class="fw-bold warehouse-stock-value"><?= intval($ws['stock']) ?></td>
+    </tr>
+  <?php endforeach; ?>
+</tbody>
+
                           </table>
                         </div>
                       </div>
