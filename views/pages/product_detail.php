@@ -1,8 +1,8 @@
 <?php
-if (!isset($_SESSION['user'])) {
-  header("Location: " . BASE_URL . "auth/login/");
-  exit();
-}
+//Archivo: views/pages/product_detail.php
+
+// Verifica si el usuario está logueado, si no, redirige
+require_once __DIR__ . '/../inc/auth_check.php';
 
 $uri = $_GET['url'] ?? 'product_detail';
 $segment = explode('/', trim($uri, '/'))[0];

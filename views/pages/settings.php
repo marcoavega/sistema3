@@ -1,15 +1,9 @@
 <?php
-// views/pages/settings.php
-// Misma estructura y comprobaciones que dashboard.php
+//Archivo: views/pages/settings.php
 
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+// Verifica si el usuario está logueado, si no, redirige
+require_once __DIR__ . '/../inc/auth_check.php';
 
-if (!isset($_SESSION['user'])) {
-    header("Location: " . BASE_URL . "auth/login/");
-    exit();
-}
 
 // Obtener segmento para marcar menú activo
 $uri = $_GET['url'] ?? 'settings';

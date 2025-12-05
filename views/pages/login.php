@@ -1,4 +1,6 @@
 <?php
+//Archivo: views/pages/login.php
+
 // Se incluye el archivo que contiene los metadatos, enlaces a hojas de estilo y scripts generales del sistema.
 include __DIR__ . '/../partials/head.php';
 
