@@ -36,8 +36,4 @@ define('PRODUCT_IMAGE_DIR', __DIR__ . '/../../assets/images/products/');
 define('PRODUCT_IMAGE_URL_PATH', BASE_URL . 'assets/images/products/'); 
 // URL base para servir las imágenes (para guardar en BD se guarda solo el nombre o ruta relativa).
 
-
-// Zona horaria global (Ciudad de México)
-date_default_timezone_set('America/Mexico_City');
-ini_set('date.timezone', 'America/Mexico_City');
 ?>
