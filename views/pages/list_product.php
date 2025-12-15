@@ -232,7 +232,6 @@ $username = htmlspecialchars($_SESSION['user']['username']);
         <?php
         include __DIR__ . '/../partials/modals/modal_add_product.php';
         include __DIR__ . '/../partials/modals/modal_edit_product.php';
-        include __DIR__ . '/../partials/modals/modal_delete_product.php';
         ?>
       <?php endif; ?>
     </main>

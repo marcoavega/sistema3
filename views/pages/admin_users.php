@@ -142,7 +142,6 @@ $username = htmlspecialchars($_SESSION['user']['username']);
               <?php
                include __DIR__ . '/../partials/modals/modal_add_user.php';
                include __DIR__ . '/../partials/modals/modal_edit_user.php';
-               include __DIR__ . '/../partials/modals/modal_delete_user.php';
               ?>
 
             </div>

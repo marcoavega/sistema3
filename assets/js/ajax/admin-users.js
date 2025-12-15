@@ -79,9 +79,51 @@ document.addEventListener("DOMContentLoaded", function () {
           new bootstrap.Modal(document.getElementById("editUserModal")).show();
         }
         if (e.target.closest(".delete-btn")) {
-          deleteUserID = rowData.user_id;
-          new bootstrap.Modal(document.getElementById("deleteUserModal")).show();
+          Swal.fire({
+            title: "¿Eliminar usuario?",
+            html: `<strong>${rowData.username}</strong><br>Esta acción no se puede deshacer.`,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Eliminar",
+            cancelButtonText: "Cancelar",
+            buttonsStyling: false,
+            customClass: {
+              confirmButton: "btn btn-danger",
+              cancelButton: "btn btn-secondary ms-2"
+            }
+          }).then(result => {
+            if (!result.isConfirmed) return;
+        
+            fetch(BASE_URL + "api/users.php?action=delete", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ user_id: rowData.user_id })
+            })
+            .then(res => res.json())
+            .then(data => {
+              if (!data.success) {
+                Swal.fire({
+                  icon: "error",
+                  title: "Error",
+                  text: data.message || "No se pudo eliminar el usuario"
+                });
+                return;
+              }
+        
+              table.deleteRow(rowData.user_id);
+        
+              Swal.fire({
+                icon: "success",
+                title: "Usuario eliminado",
+                toast: true,
+                position: "top-end",
+                timer: 2000,
+                showConfirmButton: false
+              });
+            });
+          });
         }
+        
       },
     },
   ],

@@ -33,3 +33,30 @@
     max-height: 100px;
     object-fit: contain;
 }
+
+/* ===== SweetAlert2 soporte DARK MODE ===== */
+html[data-bs-theme="dark"] .swal2-popup {
+    background-color: #212529;
+    color: #f8f9fa;
+  }
+  
+  html[data-bs-theme="dark"] .swal2-title,
+  html[data-bs-theme="dark"] .swal2-html-container {
+    color: #f8f9fa;
+  }
+  
+  html[data-bs-theme="dark"] .swal2-icon.swal2-warning {
+    color: #ffc107;
+    border-color: #ffc107;
+  }
+  
+  html[data-bs-theme="dark"] .swal2-icon.swal2-error {
+    color: #dc3545;
+    border-color: #dc3545;
+  }
+  
+  html[data-bs-theme="dark"] .swal2-icon.swal2-success {
+    color: #198754;
+    border-color: #198754;
+  }
+  

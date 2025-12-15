@@ -41,7 +41,7 @@ document.addEventListener("DOMContentLoaded", function () {
   var productsTableElement = document.getElementById("products-table");
   if (!productsTableElement) return;
 
-  var deleteProductID = null;
+  //var deleteProductID = null;
 
   console.log("Inicializando Tabulator con paginación remota...");
   var table = new Tabulator("#products-table", {
@@ -294,9 +294,77 @@ document.addEventListener("DOMContentLoaded", function () {
             e.target.classList.contains("delete-btn") ||
             e.target.closest(".delete-btn")
           ) {
+
+            // ELIMINAR
+if (
+  e.target.classList.contains("delete-btn") ||
+  e.target.closest(".delete-btn")
+) {
+  const productId = rowData.product_id;
+  const productName = rowData.product_name || '';
+
+  Swal.fire({
+    title: '¿Eliminar producto?',
+    html: `<strong>${productName}</strong><br>Esta acción no se puede deshacer.`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Eliminar',
+    cancelButtonText: 'Cancelar',
+    buttonsStyling: false,
+    customClass: {
+      confirmButton: 'btn btn-danger',
+      cancelButton: 'btn btn-secondary ms-2'
+    }
+  }).then((result) => {
+    if (!result.isConfirmed) return;
+
+    fetch(BASE_URL + "api/products.php?action=delete", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ product_id: productId }),
+    })
+      .then((res) => {
+        if (!res.ok) {
+          return res.text().then((text) => {
+            console.error("Error al eliminar producto:", text);
+            throw new Error("Error al eliminar producto");
+          });
+        }
+        return res.json();
+      })
+      .then((data) => {
+        if (!data.success) {
+          throw new Error(data.message || "No se pudo eliminar el producto");
+        }
+
+        Swal.fire({
+          icon: "success",
+          title: "Producto eliminado",
+          toast: true,
+          position: "top-end",
+          timer: 2000,
+          showConfirmButton: false,
+        });
+
+        // Recargar tabla manteniendo filtros/paginación
+        table.setData("api/products.php?action=list");
+      })
+      .catch((err) => {
+        console.error(err);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: err.message || "Error al eliminar el producto",
+        });
+      });
+  });
+}
+
+            /*
             deleteProductID = rowData.product_id;
             var deleteModalEl = document.getElementById("deleteProductModal");
             if (deleteModalEl) new bootstrap.Modal(deleteModalEl).show();
+            */
           }
         },
       },
@@ -750,8 +818,8 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
+  /*
   // === CRUD: eliminar producto ===
-  var confirmDeleteBtn = document.getElementById("confirmDeleteProductBtn");
   if (confirmDeleteBtn) {
     confirmDeleteBtn.addEventListener("click", function () {
       if (!deleteProductID) return;
@@ -802,6 +870,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
   }
+  */
 
   // EXPORTAR CSV
   var exportCSVBtn = document.getElementById("exportCSVBtn");

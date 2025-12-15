@@ -127,7 +127,22 @@ document.addEventListener('DOMContentLoaded', function () {
     // handlers
     async function onDeleteCurrencyClick(e) {
       const id = this.dataset.id;
-      if (!confirm('Eliminar moneda y sus tipos de cambio?')) return;
+    
+      const result = await Swal.fire({
+        title: '¿Eliminar moneda?',
+        text: 'Se eliminará la moneda y todos sus tipos de cambio registrados.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Eliminar',
+        cancelButtonText: 'Cancelar',
+        buttonsStyling: false,
+        customClass: {
+          confirmButton: 'btn btn-danger',
+          cancelButton: 'btn btn-secondary ms-2'
+        }
+      });
+    
+      if (!result.isConfirmed) return;
     
       try {
         const j = await fetchJSON(API + '?action=delete_currency', {
@@ -136,31 +151,86 @@ document.addEventListener('DOMContentLoaded', function () {
           headers: { 'Content-Type': 'application/json' },
         });
     
-        if (!j.success) throw new Error(j.message || 'No se pudo borrar moneda');
+        if (!j.success) {
+          throw new Error(j.message || 'No se pudo eliminar la moneda');
+        }
     
-        showToast('Moneda eliminada');
+        Swal.fire({
+          icon: 'success',
+          title: 'Eliminada',
+          text: 'La moneda fue eliminada correctamente',
+          timer: 1800,
+          showConfirmButton: false
+        });
+    
         await loadCurrencies();
         await loadRates();
+    
       } catch (err) {
         console.error(err);
-        showToast('Error al eliminar moneda', true);
+    
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: err.message || 'Error al eliminar moneda'
+        });
       }
     }
+    
     
   
     async function onDeleteRateClick(e) {
       const id = this.dataset.id;
-      if (!confirm('Eliminar este registro?')) return;
+    
+      const result = await Swal.fire({
+        title: '¿Eliminar tipo de cambio?',
+        text: 'Este registro se eliminará de forma permanente.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Eliminar',
+        cancelButtonText: 'Cancelar',
+        buttonsStyling: false,
+        customClass: {
+          confirmButton: 'btn btn-danger',
+          cancelButton: 'btn btn-secondary ms-2'
+        }
+      });
+    
+      if (!result.isConfirmed) return;
+    
       try {
-        const j = await fetchJSON(API + '?action=delete_rate', { method: 'POST', body: JSON.stringify({rate_id: id}), headers:{'Content-Type':'application/json'} });
-        if (!j.success) throw new Error(j.message || 'No se pudo borrar');
-        showToast('Registro eliminado');
+        const j = await fetchJSON(
+          API + '?action=delete_rate',
+          {
+            method: 'POST',
+            body: JSON.stringify({ rate_id: id }),
+            headers: { 'Content-Type': 'application/json' }
+          }
+        );
+    
+        if (!j.success) throw new Error(j.message || 'No se pudo eliminar');
+    
+        Swal.fire({
+          icon: 'success',
+          title: 'Eliminado',
+          text: 'El tipo de cambio fue eliminado correctamente.',
+          timer: 1800,
+          showConfirmButton: false
+        });
+    
         await loadRates();
+    
       } catch (err) {
         console.error(err);
-        showToast('Error al borrar registro', true);
+    
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'No se pudo eliminar el tipo de cambio.'
+        });
       }
     }
+    
   
     // submit forms
     const formAddCurrency = document.getElementById('formAddCurrency');
