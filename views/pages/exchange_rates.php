@@ -154,10 +154,13 @@ ob_start();
   </div>
 </div>
 
+
+
 <?php
 
-include __DIR__ . '/../partials/modals/exchange_rates/add_currency_modal.php';
-include __DIR__ . '/../partials/modals/exchange_rates/add_rate_modal.php';
+
+include __DIR__ . '/../partials/modals/add_currency_modal.php';
+include __DIR__ . '/../partials/modals/add_rate_modal.php';
 
 $content = ob_get_clean();
 include __DIR__ . '/../partials/layouts/navbar.php';

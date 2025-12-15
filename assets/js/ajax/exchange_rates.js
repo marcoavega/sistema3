@@ -128,9 +128,16 @@ document.addEventListener('DOMContentLoaded', function () {
     async function onDeleteCurrencyClick(e) {
       const id = this.dataset.id;
       if (!confirm('Eliminar moneda y sus tipos de cambio?')) return;
+    
       try {
-        const j = await fetchJSON(API, { method: 'POST', body: JSON.stringify({currency_id: id}), headers:{'Content-Type':'application/json'}, });
+        const j = await fetchJSON(API + '?action=delete_currency', {
+          method: 'POST',
+          body: JSON.stringify({ currency_id: id }),
+          headers: { 'Content-Type': 'application/json' },
+        });
+    
         if (!j.success) throw new Error(j.message || 'No se pudo borrar moneda');
+    
         showToast('Moneda eliminada');
         await loadCurrencies();
         await loadRates();
@@ -139,6 +146,7 @@ document.addEventListener('DOMContentLoaded', function () {
         showToast('Error al eliminar moneda', true);
       }
     }
+    
   
     async function onDeleteRateClick(e) {
       const id = this.dataset.id;
