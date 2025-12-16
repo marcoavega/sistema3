@@ -154,8 +154,14 @@ $username = htmlspecialchars($_SESSION['user']['username']);
 </div>
 
 <?php
-$content = ob_get_clean();
-include __DIR__ . '/../partials/layouts/navbar.php';
+$content = ob_get_clean(); // Guardamos el contenido de la vista
+
+// 1. Incluimos la estructura principal (Nav + Contenido)
+// Asegúrate de que tu sistema imprima $content en algún lugar
+include __DIR__ . '/../partials/layouts/navbar.php'; 
+
+// 2. IMPORTANTE: Aquí debes incluir el Footer (donde están los scripts de librerías)
+include __DIR__ . '/../partials/layouts/footer.php'; 
 ?>
 
 <script src="<?php echo BASE_URL; ?>assets/js/ajax/admin-users.js"></script>

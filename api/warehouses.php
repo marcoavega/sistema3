@@ -56,7 +56,7 @@ try {
         $id = $pdo->lastInsertId();
 
         // registrar log
-        register_log($pdo, $user_id, "Creó almacén id {$id}: {$name}");
+        register_log($pdo, $user_id, "Creó almacén Número {$id}: {$name}");
 
         $stmt = $pdo->prepare("SELECT warehouse_id AS id, name, created_at, updated_at FROM warehouses WHERE warehouse_id = :id LIMIT 1");
         $stmt->execute(['id' => $id]);
