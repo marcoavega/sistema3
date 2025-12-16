@@ -296,67 +296,65 @@ document.addEventListener("DOMContentLoaded", function () {
           ) {
 
             // ELIMINAR
-if (
-  e.target.classList.contains("delete-btn") ||
-  e.target.closest(".delete-btn")
-) {
+// --- DENTRO DE cellClick -> ELIMINAR ---
+if (e.target.classList.contains("delete-btn") || e.target.closest(".delete-btn")) {
   const productId = rowData.product_id;
   const productName = rowData.product_name || '';
+  const stockActual = parseInt(rowData.stock) || 0;
+
+  // Configuración dinámica del mensaje
+  let title = '¿Eliminar producto?';
+  let icon = 'warning';
+  let htmlContent = `Estás a punto de eliminar <strong>${productName}</strong>.`;
+
+  // Si hay stock, cambiamos la advertencia a algo más serio
+  if (stockActual > 0) {
+      title = '<span style="color: #d33">¡Atención: Stock Disponible!</span>';
+      icon = 'error';
+      htmlContent = `El producto <strong>${productName}</strong> todavía tiene <strong>${stockActual} unidades</strong> en existencia.<br><br><span class="text-danger fw-bold">¿Realmente deseas eliminarlo? Esto afectará los inventarios.</span>`;
+  }
 
   Swal.fire({
-    title: '¿Eliminar producto?',
-    html: `<strong>${productName}</strong><br>Esta acción no se puede deshacer.`,
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonText: 'Eliminar',
-    cancelButtonText: 'Cancelar',
-    buttonsStyling: false,
-    customClass: {
-      confirmButton: 'btn btn-danger',
-      cancelButton: 'btn btn-secondary ms-2'
-    }
+      title: title,
+      html: htmlContent,
+      icon: icon,
+      showCancelButton: true,
+      confirmButtonText: 'Sí, eliminar de todos modos',
+      cancelButtonText: 'Cancelar',
+      buttonsStyling: false,
+      customClass: {
+          confirmButton: 'btn btn-danger px-4',
+          cancelButton: 'btn btn-secondary ms-2'
+      }
   }).then((result) => {
-    if (!result.isConfirmed) return;
-
-    fetch(BASE_URL + "api/products.php?action=delete", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ product_id: productId }),
-    })
-      .then((res) => {
-        if (!res.ok) {
-          return res.text().then((text) => {
-            console.error("Error al eliminar producto:", text);
-            throw new Error("Error al eliminar producto");
+      if (result.isConfirmed) {
+          // Ejecutar la petición fetch para borrar
+          fetch(BASE_URL + "api/products.php?action=delete", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ product_id: productId, product_name: productName }),
+          })
+          .then(res => res.json())
+          .then(data => {
+              if (data.success) {
+                  Swal.fire({
+                      icon: "success",
+                      title: "Eliminado",
+                      text: "El producto ha sido borrado y el log registrado.",
+                      toast: true,
+                      position: "top-end",
+                      timer: 3000,
+                      showConfirmButton: false
+                  });
+                  table.setData(); // Recargar tabla
+              } else {
+                  throw new Error(data.message);
+              }
+          })
+          .catch(err => {
+              Swal.fire("Error", err.message, "error");
           });
-        }
-        return res.json();
-      })
-      .then((data) => {
-        if (!data.success) {
-          throw new Error(data.message || "No se pudo eliminar el producto");
-        }
-
-        Swal.fire({
-          icon: "success",
-          title: "Producto eliminado",
-          toast: true,
-          position: "top-end",
-          timer: 2000,
-          showConfirmButton: false,
-        });
-
-        // Recargar tabla manteniendo filtros/paginación
-        table.setData("api/products.php?action=list");
-      })
-      .catch((err) => {
-        console.error(err);
-        Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: err.message || "Error al eliminar el producto",
-        });
-      });
+      }
   });
 }
 

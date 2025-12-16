@@ -3,77 +3,121 @@
   <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
     <div class="modal-content border-0 shadow-lg">
       
-      <!-- Header con estilo e ícono -->
-      <div class="modal-header bg-gradient position-relative overflow-hidden">
-        <div class="position-absolute top-0 start-0 w-100 h-100 opacity-10">
-          <div class="d-flex align-items-center justify-content-center h-100">
-            <i class="fas fa-user-plus" style="font-size: 120px;"></i>
-          </div>
+      <div class="modal-header bg-primary text-white position-relative overflow-hidden border-0 py-4">
+        <div class="modal-header-icon-bg">
+            <i class="fas fa-user-plus"></i>
         </div>
-        <div class="position-relative">
-          <h4 class="modal-title fw-bold mb-0" id="addUserModalLabel">
-            <i class="fas fa-user-plus me-2"></i>
-            Agregar Nuevo Usuario
+        
+        <div class="position-relative z-1 ms-2">
+          <h4 class="modal-title fw-bold d-flex align-items-center" id="addUserModalLabel">
+            <i class="fas fa-plus-circle me-2"></i> Agregar Nuevo Usuario
           </h4>
-          <small class="opacity-75">Complete la información del usuario</small>
+          <p class="mb-0 opacity-75 small">Complete la información para registrar el acceso al sistema</p>
         </div>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        <button type="button" class="btn-close btn-close-white z-1" data-bs-dismiss="modal" aria-label="Cerrar"></button>
       </div>
 
-      <!-- Cuerpo del formulario -->
-      <div class="modal-body p-4">
+      <div class="modal-body p-4 bg-body-tertiary">
         <form id="addUserForm">
-          <div class="row g-3">
-            <div class="col-md-6">
-              <label for="new-username" class="form-label fw-semibold">
-                <i class="fas fa-user me-1 text-muted"></i> Usuario
-              </label>
-              <input type="text" class="form-control form-control-lg" id="new-username" required placeholder="Ej. juan123">
+
+          <div class="row g-4">
+            
+            <div class="col-lg-8">
+                
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-body border-bottom-0 pt-4 pb-2">
+                        <h6 class="fw-bold text-primary mb-0"><i class="fas fa-id-card me-2"></i>Credenciales de Acceso</h6>
+                    </div>
+                    <div class="card-body pt-2">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="new-username" class="form-label small text-muted fw-bold text-uppercase">Nombre de Usuario</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-user text-primary"></i></span>
+                                    <input type="text" class="form-control" id="new-username" name="username" required placeholder="Ej. juan.perez">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="new-email" class="form-label small text-muted fw-bold text-uppercase">Correo Electrónico</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-envelope text-primary"></i></span>
+                                    <input type="email" class="form-control" id="new-email" name="email" required placeholder="usuario@correo.com">
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <label for="new-password" class="form-label small text-muted fw-bold text-uppercase">Contraseña</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-lock text-primary"></i></span>
+                                    <input type="password" class="form-control form-control-lg fw-bold" id="new-password" name="password" required placeholder="••••••••">
+                                </div>
+                                <small class="text-muted mt-1 d-block">Asegúrese de usar una contraseña segura.</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-body border-bottom-0 pt-4 pb-2">
+                        <h6 class="fw-bold text-primary mb-0"><i class="fas fa-shield-alt me-2"></i>Seguridad y Estado</h6>
+                    </div>
+                    <div class="card-body pt-2">
+                        <p class="small text-muted mb-0">Esta cuenta podrá acceder a los módulos según el nivel de privilegio asignado.</p>
+                    </div>
+                </div>
             </div>
 
-            <div class="col-md-6">
-              <label for="new-email" class="form-label fw-semibold">
-                <i class="fas fa-envelope me-1 text-muted"></i> Email
-              </label>
-              <input type="email" class="form-control form-control-lg" id="new-email" required placeholder="usuario@correo.com">
-            </div>
+            <div class="col-lg-4">
+                
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-body">
+                        <h6 class="fw-bold text-primary mb-3"><i class="fas fa-user-shield me-2"></i>Privilegios</h6>
+                        
+                        <div class="mb-3">
+                            <label for="new-level" class="form-label small fw-bold">Nivel de Usuario</label>
+                            <select id="new-level" name="id_level_user" class="form-select" required>
+                                <option value="">Seleccionar nivel...</option>
+                                <?php foreach ($levels as $lvl): ?>
+                                  <option value="<?= $lvl['id_level_user'] ?>">
+                                    <?= htmlspecialchars($lvl['description_level']) ?>
+                                  </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
 
-            <div class="col-md-6">
-              <label for="new-password" class="form-label fw-semibold">
-                <i class="fas fa-lock me-1 text-muted"></i> Contraseña
-              </label>
-              <input type="password" class="form-control form-control-lg" id="new-password" required placeholder="••••••••">
-            </div>
+                        <div class="mb-0">
+                            <label for="new-user-status" class="form-label small fw-bold">Estado de Cuenta</label>
+                            <select class="form-select" id="new-user-status" name="status">
+                                <option value="1" selected>✅ Activo</option>
+                                <option value="0">❌ Suspendido</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
 
-            <div class="col-md-6">
-              <label for="new-level" class="form-label fw-semibold">
-                <i class="fas fa-user-shield me-1 text-muted"></i> Nivel
-              </label>
-              <select id="new-level" class="form-select form-select-lg" required>
-                <?php foreach ($levels as $lvl): ?>
-                  <option value="<?= $lvl['id_level_user'] ?>">
-                    <?= htmlspecialchars($lvl['description_level']) ?>
-                  </option>
-                <?php endforeach; ?>
-              </select>
+                <div class="card shadow-sm border-0 bg-primary text-white">
+                    <div class="card-body p-3">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-lightbulb fa-2x me-3 opacity-50"></i>
+                            <div>
+                                <small class="fw-bold d-block">Nota:</small>
+                                <small>Los cambios de nivel afectan los permisos de forma inmediata.</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
-          </div>
-        </form>
+          </div> </form>
       </div>
 
-      <!-- Footer con botones estilizados -->
-      <div class="modal-footer border-0 p-4">
-        <div class="d-flex gap-2 w-100 justify-content-end">
-          <button type="button" class="btn btn-outline-secondary btn-lg px-4" data-bs-dismiss="modal">
-            <i class="fas fa-times me-2"></i> Cancelar
-          </button>
-          <button type="button" class="btn btn-primary btn-lg px-4 shadow" id="saveNewUserBtn">
-            <i class="fas fa-save me-2"></i>
+      <div class="modal-footer border-top-0 bg-body py-3">
+        <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-primary px-4 shadow-sm" id="saveNewUserBtn">
+            <i class="fas fa-save me-2"></i> Guardar Usuario
             <span class="spinner-border spinner-border-sm me-2 d-none" role="status" aria-hidden="true"></span>
-            Guardar Usuario
-          </button>
-        </div>
+        </button>
       </div>
+
     </div>
   </div>
 </div>

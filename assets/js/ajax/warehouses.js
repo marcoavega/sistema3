@@ -1,220 +1,226 @@
 document.addEventListener('DOMContentLoaded', function () {
+    // 1. SELECTORES DE ELEMENTOS
     const tbody = document.getElementById('warehouses-tbody');
-    const editModalEl = document.getElementById('editWarehouseModal');
-    const editModal = new bootstrap.Modal(editModalEl);
-    //const deleteModalEl = document.getElementById('deleteWarehouseModal');
-    //const deleteModal = new bootstrap.Modal(deleteModalEl);
-    //let deleteTargetId = null;
-  
     const API_URL = `${BASE_URL}api/warehouses.php`;
-  
-    // Cargar lista desde API
+
+    // Inicialización de Modales (Verifica que los IDs coincidan con los archivos PHP)
+    const addModalEl = document.getElementById('addWarehouseModal');
+    const editModalEl = document.getElementById('editWarehouseModal');
+
+    // Solo inicializamos si los elementos existen en el DOM para evitar el error "backdrop"
+    let addModal, editModal;
+    
+    if (addModalEl) {
+        addModal = new bootstrap.Modal(addModalEl);
+    } else {
+        console.error("Error: No se encontró el elemento #addWarehouseModal en el HTML.");
+    }
+
+    if (editModalEl) {
+        editModal = new bootstrap.Modal(editModalEl);
+    } else {
+        console.error("Error: No se encontró el elemento #editWarehouseModal en el HTML.");
+    }
+
+    // 2. FUNCIÓN PARA CARGAR LA TABLA
     async function loadWarehouses() {
-      try {
-        const res = await fetch(`${API_URL}?action=list`);
-        const j = await res.json();
-        if (!j.success) throw new Error(j.message || 'Error al listar');
-        renderRows(j.data || []);
-      } catch (err) {
-        console.error(err);
-        showToast('Error al cargar almacenes', true);
-      }
-    }
-  
-    function renderRows(items) {
-      tbody.innerHTML = '';
-      if (!Array.isArray(items) || items.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="3" class="text-center text-muted">No hay almacenes</td></tr>';
-        return;
-      }
-      items.forEach(row => {
-        const tr = document.createElement('tr');
-        tr.dataset.id = row.id;
-        tr.innerHTML = `
-          <td class="fw-semibold">${escapeHtml(row.id)}</td>
-          <td class="warehouse-name">${escapeHtml(row.name)}</td>
-          <td class="text-center">
-            <div class="btn-group" role="group">
-              <button class="btn btn-sm btn-outline-primary btn-edit-warehouse" data-id="${escapeAttr(row.id)}" data-name="${escapeAttr(row.name)}">
-                <i class="bi bi-pencil-square"></i> Editar
-              </button>
-              <button class="btn btn-sm btn-outline-danger btn-delete-warehouse" data-id="${escapeAttr(row.id)}">
-                <i class="bi bi-trash3"></i> Borrar
-              </button>
-            </div>
-          </td>
-        `;
-        tbody.appendChild(tr);
-      });
-  
-      // bind
-      document.querySelectorAll('.btn-edit-warehouse').forEach(btn => {
-        btn.removeEventListener('click', onEditClick);
-        btn.addEventListener('click', onEditClick);
-      });
-      document.querySelectorAll('.btn-delete-warehouse').forEach(btn => {
-        btn.removeEventListener('click', onDeleteClick);
-        btn.addEventListener('click', onDeleteClick);
-      });
-    }
-  
-    function onEditClick(e) {
-      const id = this.dataset.id;
-      const name = this.dataset.name || '';
-      document.getElementById('edit-warehouse-id').value = id;
-      document.getElementById('edit-warehouse-name').value = name;
-      editModalEl.querySelector('.modal-title').textContent = id ? 'Editar Almacén' : 'Nuevo Almacén';
-      editModal.show();
-    }
-  
-    /*function onDeleteClick(e) {
-      deleteTargetId = this.dataset.id;
-      deleteModal.show();
-    }*/
-      function onDeleteClick(e) {
-        const id = this.dataset.id;
-        const row = this.closest('tr');
-        const name = row?.querySelector('.warehouse-name')?.textContent || '';
-      
-        Swal.fire({
-          title: '¿Eliminar almacén?',
-          html: `<strong>${name}</strong><br>Esta acción no se puede deshacer.`,
-          icon: 'warning',
-          showCancelButton: true,
-          confirmButtonText: 'Eliminar',
-          cancelButtonText: 'Cancelar',
-          buttonsStyling: false,
-          customClass: {
-            confirmButton: 'btn btn-danger',
-            cancelButton: 'btn btn-secondary ms-2'
-          }
-        }).then(async (result) => {
-          if (!result.isConfirmed) return;
-      
-          try {
-            const fd = new FormData();
-            fd.append('id', id);
-      
-            const res = await fetch(`${API_URL}?action=delete`, {
-              method: 'POST',
-              body: fd
-            });
-      
+        try {
+            const res = await fetch(`${API_URL}?action=list`);
             const j = await res.json();
-            if (!j.success) throw new Error(j.message || 'Error al eliminar');
-      
-            await loadWarehouses();
-      
-            Swal.fire({
-              icon: 'success',
-              title: 'Almacén eliminado',
-              toast: true,
-              position: 'top-end',
-              timer: 2000,
-              showConfirmButton: false
-            });
-          } catch (err) {
+            if (!j.success) throw new Error(j.message || 'Error al listar');
+            renderRows(j.data || []);
+        } catch (err) {
             console.error(err);
-            Swal.fire({
-              icon: 'error',
-              title: 'Error',
-              text: err.message || 'No se pudo eliminar el almacén'
-            });
-          }
-        });
-      }
-      
-  
-    // Botón crear
-    document.getElementById('addWarehouseBtn').addEventListener('click', () => {
-      document.getElementById('edit-warehouse-id').value = '';
-      document.getElementById('edit-warehouse-name').value = '';
-      editModalEl.querySelector('.modal-title').textContent = 'Nuevo Almacén';
-      editModal.show();
-    });
-  
-    // Guardar (create/update)
-    document.getElementById('editWarehouseForm').addEventListener('submit', async function (e) {
-      e.preventDefault();
-      const id = document.getElementById('edit-warehouse-id').value;
-      const name = document.getElementById('edit-warehouse-name').value.trim();
-      if (!name) return showToast('Nombre obligatorio', true);
-  
-      try {
-        const fd = new FormData();
-        fd.append('name', name);
-        if (id) fd.append('id', id);
-  
-        const action = id ? 'update' : 'create';
-        const res = await fetch(`${API_URL}?action=${action}`, {
-          method: 'POST',
-          body: fd
-        });
-        const j = await res.json();
-        if (!j.success) throw new Error(j.message || 'Error al guardar');
-  
-        // actualizar en la UI: recargar la lista
-        await loadWarehouses();
-        editModal.hide();
-        showToast('Almacén guardado correctamente.');
-      } catch (err) {
-        console.error(err);
-        showToast(err.message || 'Error al guardar', true);
-      }
-    });
-  
-    /*
-    // Confirmar eliminación
-    document.getElementById('confirmDeleteWarehouseBtn').addEventListener('click', async function () {
-      if (!deleteTargetId) return;
-      try {
-        const fd = new FormData();
-        fd.append('id', deleteTargetId);
-        const res = await fetch(`${API_URL}?action=delete`, {
-          method: 'POST',
-          body: fd
-        });
-        const j = await res.json();
-        if (!j.success) throw new Error(j.message || 'Error al borrar');
-        await loadWarehouses();
-        deleteModal.hide();
-        showToast('Almacén eliminado.');
-        deleteTargetId = null;
-      } catch (err) {
-        console.error(err);
-        showToast(err.message || 'Error al borrar', true);
-      }
-    });
-    */
-  
-    // Helpers
-    function showToast(msg, err = false) {
-      const t = document.createElement('div');
-      t.textContent = msg;
-      t.style.position = 'fixed';
-      t.style.bottom = '25px';
-      t.style.right = '25px';
-      t.style.padding = '10px 15px';
-      t.style.borderRadius = '8px';
-      t.style.background = err ? '#dc3545' : '#198754';
-      t.style.color = 'white';
-      t.style.zIndex = 9999;
-      document.body.appendChild(t);
-      setTimeout(() => t.remove(), 3000);
+            showToast('Error al cargar almacenes', true);
+        }
     }
+
+    function renderRows(items) {
+        if (!tbody) return;
+        tbody.innerHTML = '';
+        
+        if (!Array.isArray(items) || items.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="3" class="text-center text-muted p-4">No hay almacenes registrados</td></tr>';
+            return;
+        }
+
+        items.forEach(row => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td class="fw-bold text-primary" style="width: 80px;">#${escapeHtml(row.id)}</td>
+                <td class="warehouse-name fw-semibold">${escapeHtml(row.name)}</td>
+                <td class="text-center">
+                    <div class="btn-group shadow-sm" role="group">
+                        <button class="btn btn-sm btn-outline-primary btn-edit-warehouse" 
+                                data-id="${escapeAttr(row.id)}" 
+                                data-name="${escapeAttr(row.name)}">
+                            <i class="fas fa-edit me-1"></i> Editar
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger btn-delete-warehouse" 
+                                data-id="${escapeAttr(row.id)}" 
+                                data-name="${escapeAttr(row.name)}">
+                            <i class="fas fa-trash-alt me-1"></i> Borrar
+                        </button>
+                    </div>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        // Asignar eventos a los botones recién creados
+        document.querySelectorAll('.btn-edit-warehouse').forEach(btn => {
+            btn.addEventListener('click', onEditClick);
+        });
+        document.querySelectorAll('.btn-delete-warehouse').forEach(btn => {
+            btn.addEventListener('click', onDeleteClick);
+        });
+    }
+
+    // 3. EVENTOS DE APERTURA DE MODALES
+    const addBtn = document.getElementById('addWarehouseBtn');
+    if (addBtn) {
+        addBtn.addEventListener('click', () => {
+            document.getElementById('addWarehouseForm').reset();
+            addModal.show();
+        });
+    }
+
+    function onEditClick() {
+        const id = this.dataset.id;
+        const name = this.dataset.name;
+        
+        document.getElementById('edit-warehouse-id').value = id;
+        document.getElementById('edit-warehouse-name').value = name;
+        editModal.show();
+    }
+
+    // 4. PROCESAR GUARDADO (NUEVO)
+    const addForm = document.getElementById('addWarehouseForm');
+    if (addForm) {
+        addForm.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const name = document.getElementById('new-warehouse-name').value.trim();
+            const btn = document.getElementById('saveNewWarehouseBtn');
+
+            try {
+                toggleLoading(btn, true);
+                const fd = new FormData();
+                fd.append('name', name);
+
+                const res = await fetch(`${API_URL}?action=create`, { method: 'POST', body: fd });
+                const j = await res.json();
+                if (!j.success) throw new Error(j.message);
+
+                addModal.hide();
+                showToast('Almacén creado con éxito');
+                await loadWarehouses();
+            } catch (err) {
+                showToast(err.message, true);
+            } finally {
+                toggleLoading(btn, false);
+            }
+        });
+    }
+
+    // 5. PROCESAR ACTUALIZACIÓN (EDITAR)
+    const editForm = document.getElementById('editWarehouseForm');
+    if (editForm) {
+        editForm.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const id = document.getElementById('edit-warehouse-id').value;
+            const name = document.getElementById('edit-warehouse-name').value.trim();
+            const btn = document.getElementById('saveChangesWarehouseBtn');
+
+            try {
+                toggleLoading(btn, true);
+                const fd = new FormData();
+                fd.append('id', id);
+                fd.append('name', name);
+
+                const res = await fetch(`${API_URL}?action=update`, { method: 'POST', body: fd });
+                const j = await res.json();
+                if (!j.success) throw new Error(j.message);
+
+                editModal.hide();
+                showToast('Almacén actualizado con éxito');
+                await loadWarehouses();
+            } catch (err) {
+                showToast(err.message, true);
+            } finally {
+                toggleLoading(btn, false);
+            }
+        });
+    }
+
+    // 6. ELIMINAR (CON SWAL)
+    function onDeleteClick() {
+        const id = this.dataset.id;
+        const name = this.dataset.name;
+
+        Swal.fire({
+            title: '¿Eliminar almacén?',
+            html: `Confirma que desea eliminar: <b>${name}</b>`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar',
+            customClass: {
+                confirmButton: 'btn btn-danger me-2',
+                cancelButton: 'btn btn-secondary'
+            },
+            buttonsStyling: false
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    const fd = new FormData();
+                    fd.append('id', id);
+                    const res = await fetch(`${API_URL}?action=delete`, { method: 'POST', body: fd });
+                    const j = await res.json();
+                    if (!j.success) throw new Error(j.message);
+                    
+                    showToast('Almacén eliminado');
+                    await loadWarehouses();
+                } catch (err) {
+                    Swal.fire('Error', err.message, 'error');
+                }
+            }
+        });
+    }
+
+    // HELPERS
+    function toggleLoading(btn, loading) {
+        if (!btn) return;
+        const icon = btn.querySelector('i');
+        if (loading) {
+            btn.disabled = true;
+            if (icon) icon.className = 'fas fa-spinner fa-spin me-2';
+        } else {
+            btn.disabled = false;
+            if (icon) icon.className = icon.dataset.origClass || 'fas fa-save me-2';
+        }
+    }
+
+    function showToast(msg, isError = false) {
+        Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: isError ? 'error' : 'success',
+            title: msg,
+            showConfirmButton: false,
+            timer: 3000
+        });
+    }
+
     function escapeHtml(str) {
-      return String(str === null || typeof str === 'undefined' ? '' : str)
-        .replace(/&/g, '&amp;')
-        .replace(/"/g, '&quot;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;');
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
     }
+
     function escapeAttr(str) {
-      return String(str === null || typeof str === 'undefined' ? '' : str)
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
+        return String(str).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
     }
-  
-    // carga inicial
+
+    // CARGA INICIAL
     loadWarehouses();
-  });
+});
