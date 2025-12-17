@@ -5,30 +5,39 @@
 require_once __DIR__ . '/../inc/auth_check.php';
 
 
+// Inicia el buffer de salida
+ob_start();
+
+// Obtiene el segmento de la URL para determinar el ítem activo en el menú
 $uri = $_GET['url'] ?? 'admin_users';
 $segment = explode('/', trim($uri, '/'))[0];
 
-ob_start();
-
+// Conecta a la base de datos
 require_once __DIR__ . '/../../models/Database.php';
+
+// Obtiene la conexión a la base de datos
 $pdo = (new Database())->getConnection();
 
+// Consulta para obtener los niveles de usuario
 $stmt = $pdo->query("SELECT id_level_user, description_level FROM levels_users ORDER BY level");
 $levels = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+// Obtiene el nombre de usuario para mostrar
 $username = htmlspecialchars($_SESSION['user']['username']);
-
 
 ?>
 
+<!-- Contenedor principal -->
 <div class="container-fluid m-0 p-0 min-vh-100" data-bs-theme="auto">
   <div class="row g-0">
 
     <!-- Barra lateral con gradiente moderno -->
+    <!-- Incluye el menú lateral para usuarios -->
     <?php require_once __DIR__ . '/../partials/layouts/laterals_menus/lateral_menu_users.php'; ?>
 
     <main class="col-12 col-md-10">
 
+      <!-- Header con breadcrumb moderno -->
       <div class="bg-body shadow-sm border-bottom">
         <div class="container-fluid px-4 py-3">
           <div class="d-flex justify-content-between align-items-center">
@@ -36,10 +45,13 @@ $username = htmlspecialchars($_SESSION['user']['username']);
               <nav aria-label="breadcrumb">
                 <ol class="breadcrumb mb-2">
                   <li class="breadcrumb-item"><a href="<?= BASE_URL ?>dashboard" class="text-decoration-none">Dashboard</a></li>
+                  <!-- Título de la página -->
                   <li class="breadcrumb-item active">Administración de Usuarios</li>
                 </ol>
               </nav>
+              <!-- Título de la página -->
               <h4 class="mb-0 fw-bold">Gestión de Usuarios</h4>
+              <!-- Texto de bienvenida -->
               <small class="text-muted">Bienvenido, <?= $username ?></small>
             </div>
 
