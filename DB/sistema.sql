@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 17-12-2025 a las 22:44:16
+-- Tiempo de generación: 20-12-2025 a las 00:51:31
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -89,8 +89,7 @@ CREATE TABLE `currencies` (
 INSERT INTO `currencies` (`currency_id`, `currency_code`, `currency_name`, `country`, `created_at`) VALUES
 (1, 'MXN', 'Peso Mexicano', 'México', '2025-11-20 18:42:14'),
 (2, 'USD', 'Dólar Estadounidense', 'Estados Unidos', '2025-11-20 18:42:14'),
-(6, 'EURO', 'Euro', 'Europa', '2025-11-21 04:50:43'),
-(11, 'EURO2', 'Euro2', 'Europa2', '2025-12-16 16:03:45');
+(6, 'EURO', 'Euro', 'Europa', '2025-11-21 04:50:43');
 
 -- --------------------------------------------------------
 
@@ -113,8 +112,7 @@ CREATE TABLE `exchange_rates` (
 
 INSERT INTO `exchange_rates` (`rate_id`, `currency_id`, `rate`, `rate_date`, `notes`, `created_at`) VALUES
 (1, 2, 18.500000, '2025-11-20', '', '2025-11-20 18:42:54'),
-(2, 2, 19.000000, '2025-11-20', '', '2025-11-20 19:05:45'),
-(8, 11, 25.000000, '2025-12-16', 'fgh', '2025-12-16 16:29:27');
+(2, 2, 19.000000, '2025-11-20', '', '2025-11-20 19:05:45');
 
 -- --------------------------------------------------------
 
@@ -10801,7 +10799,9 @@ INSERT INTO `user_logs` (`id`, `user_id`, `action`, `timestamp`) VALUES
 (356, 27, 'Salida -5 proructo51245 en Almacen Dental Trade — Nota: hghj', '2025-12-17 15:19:24'),
 (357, 27, 'Transferencia proructo51245 qty=20 de Almacen General a Almacen Dental Trade — Nota: dgdg', '2025-12-17 15:21:08'),
 (358, 27, 'Actualizó el producto: proructo51245', '2025-12-17 15:41:14'),
-(359, 27, 'Actualizó el producto: proructo51245', '2025-12-17 15:41:24');
+(359, 27, 'Actualizó el producto: proructo51245', '2025-12-17 15:41:24'),
+(360, 27, 'login', '2025-12-18 11:03:29'),
+(361, 27, 'login', '2025-12-19 10:27:13');
 
 -- --------------------------------------------------------
 
@@ -11012,13 +11012,13 @@ ALTER TABLE `companys`
 -- AUTO_INCREMENT de la tabla `currencies`
 --
 ALTER TABLE `currencies`
-  MODIFY `currency_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `currency_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT de la tabla `exchange_rates`
 --
 ALTER TABLE `exchange_rates`
-  MODIFY `rate_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `rate_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT de la tabla `levels_users`
@@ -11060,7 +11060,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT de la tabla `user_logs`
 --
 ALTER TABLE `user_logs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=360;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=362;
 
 --
 -- AUTO_INCREMENT de la tabla `warehouses`
