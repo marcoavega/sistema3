@@ -11,7 +11,7 @@ $db = (new Database())->getConnection();
 
 // Parámetros GET con valores por defecto
 $page    = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
-$size    = isset($_GET['size']) ? max(1, intval($_GET['size'])) : 20;
+$size    = isset($_GET['size']) ? max(1, intval($_GET['size'])) : 1000;
 $search  = isset($_GET['search']) ? trim($_GET['search']) : '';
 $user_id = isset($_GET['user_id']) ? intval($_GET['user_id']) : (isset($_SESSION['user']['user_id']) ? intval($_SESSION['user']['user_id']) : null);
 

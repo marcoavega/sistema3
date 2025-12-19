@@ -102,8 +102,12 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   document.getElementById("exportPDFBtn").addEventListener("click", () => {
     activityTable.download("pdf", "actividad_reciente.pdf", {
-      orientation: "portrait",
-      title: "Actividad Reciente"
+      orientation: "landscape", // <--- CAMBIADO A HORIZONTAL
+      title: "Actividad Reciente",
+      autoTable: {
+        theme: 'grid',
+        headStyles: { fillColor: [0, 123, 255] } // Opcional: azul para el encabezado
+      }
     });
   });
   document.getElementById("exportJSONBtn").addEventListener("click", () => {
