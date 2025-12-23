@@ -155,14 +155,16 @@ $segment = explode('/', trim($uri, '/'))[0];
 include __DIR__ . '/../modals/modal-logout.php';
 ?>
 
-<!-- Contenedor principal -->
 <div class="container-fluid">
-    <?php
+    <?php 
     // Se carga dinámicamente el contenido de cada página
-    echo $content;
+    echo $content; 
+
+    // INSERTAMOS EL FOOTER AQUÍ: 
+    // Ahora es parte oficial del layout y se mostrará debajo del contenido
+    include __DIR__ . '/../footer.php'; 
     ?>
 </div>
 
 </body>
-
 </html>

@@ -1,279 +1,352 @@
 document.addEventListener('DOMContentLoaded', function () {
-  const API = `${BASE_URL}api/exchange_rates.php`;
-  const currenciesListEl = document.querySelector('#currencies-list');
-  const ratesTbody = document.querySelector('#rates-tbody');
-  const modalAddCurrency = document.getElementById('modalAddCurrency');
-  const modalAddRate = document.getElementById('modalAddRate');
-  const bsModalAddCurrency = modalAddCurrency ? new bootstrap.Modal(modalAddCurrency) : null;
-  const bsModalAddRate = modalAddRate ? new bootstrap.Modal(modalAddRate) : null;
+    const API = `${BASE_URL}api/exchange_rates.php`;
+    const ratesTbody = document.querySelector('#rates-tbody');
+    const currenciesListEl = document.querySelector('#currencies-list');
 
-  function showToast(msg, err = false) {
-      const t = document.createElement('div');
-      t.textContent = msg;
-      t.style.position = 'fixed';
-      t.style.bottom = '25px';
-      t.style.right = '25px';
-      t.style.padding = '10px 15px';
-      t.style.borderRadius = '8px';
-      t.style.background = err ? '#dc3545' : '#198754';
-      t.style.color = 'white';
-      t.style.zIndex = 9999;
-      document.body.appendChild(t);
-      setTimeout(() => t.remove(), 2500);
-  }
-
-  async function fetchJSON(url, opts = {}) {
-      const res = await fetch(url, opts);
-      // Si el servidor responde 500, no lanzamos error de inmediato, 
-      // primero intentamos leer el JSON para ver si es un duplicado.
-      const j = await res.json().catch(() => ({ success: false, message: 'Error de servidor' }));
-      return j;
-  }
-
-  async function loadCurrencies() {
-      try {
-          const j = await fetchJSON(`${API}?action=list_currencies`);
-          if (!j.success) throw new Error(j.message);
-          renderCurrencies(j.data || []);
-      } catch (err) {
-          console.error(err);
-      }
-  }
-
-  async function loadRates() {
-      try {
-          const j = await fetchJSON(`${API}?action=list_rates`);
-          if (!j.success) throw new Error(j.message);
-          renderRates(j.data || []);
-      } catch (err) {
-          console.error(err);
-      }
-  }
-
-  function renderCurrencies(items) {
-    const ul = document.querySelector('#currencies-list');
-    // Buscamos el select específicamente por su nombre dentro del modal de tasas
-    const sel = document.querySelector('#formAddRate select[name="currency_id"]');
+    // --- VARIABLES DE ESTADO ---
+    let allRates = [];
+    let currentPage = 1;
+    const recordsPerPage = 10;
     
-    if (ul) {
-        ul.innerHTML = '';
-        if (items.length === 0) {
-            ul.innerHTML = '<li class="list-group-item text-muted">No hay monedas registradas.</li>';
-        } else {
-            items.forEach(c => {
-                const li = document.createElement('li');
-                li.className = 'list-group-item bg-transparent border-0 d-flex justify-content-between align-items-center p-3 mb-2 rounded-3 bg-body-secondary bg-opacity-25';
-                li.innerHTML = `
-                    <div>
-                        <strong class="text-body">${escapeHtml(c.currency_code)}</strong>
-                        <div class="small text-muted">${escapeHtml(c.currency_name)}</div>
-                    </div>
-                    <div>
-                        <button class="btn btn-sm btn-outline-danger btn-delete-currency" data-id="${c.currency_id}">
-                            <i class="bi bi-trash-fill"></i> Eliminar
-                        </button>
-                    </div>
-                `;
-                ul.appendChild(li);
-            });
-        }
-    }
-    // --- ACTUALIZACIÓN DEL DESPLEGABLE ---
-    if (sel) {
-      const valorActual = sel.value; // Guardamos lo que estaba seleccionado (por si acaso)
-      sel.innerHTML = '<option value="">Selecciona...</option>';
-      
-      items.forEach(c => {
-          const o = document.createElement('option');
-          o.value = c.currency_id;
-          o.textContent = `${escapeHtml(c.currency_code)} — ${escapeHtml(c.currency_name)}`;
-          sel.appendChild(o);
-      });
-      
-      // Si la moneda que estaba seleccionada sigue existiendo, la mantenemos
-      sel.value = valorActual;
-  }
+    // Filtros activos
+    let currentStart = '';
+    let currentEnd = '';
 
-  document.querySelectorAll('.btn-delete-currency').forEach(btn => {
-      btn.onclick = onDeleteCurrencyClick;
-  });
-}
+    // ==========================================
+    // 1. RENDERIZADO
+    // ==========================================
 
-function renderRates(items) {
-    if (!ratesTbody) return;
-    ratesTbody.innerHTML = '';
-    items.forEach(r => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-        <td class="ps-4 text-body">${escapeHtml(r.rate_date)}</td>
-        <td class="text-body"><strong>${escapeHtml(r.currency_code)}</strong></td>
-        <td><span class="badge bg-success-subtle text-success border border-success-subtle fs-6">$${Number(r.rate).toFixed(6)}</span></td>
-        <td class="small text-muted italic">${escapeHtml(r.notes || '')}</td>
-        <td class="text-end pe-4">
-          <button class="btn btn-sm btn-danger btn-delete-rate" data-id="${r.rate_id}">
-            <i class="bi bi-trash-fill"></i> Borrar
-          </button>
-        </td>
-      `;
-        ratesTbody.appendChild(tr);
-    });
-    document.querySelectorAll('.btn-delete-rate').forEach(btn => {
-        btn.onclick = onDeleteRateClick;
-    });
-}
+    const renderCurrencies = (items) => {
+        if (!currenciesListEl) return;
+        currenciesListEl.innerHTML = '';
+        
+        const selectCurrency = document.querySelector('select[name="currency_id"]');
+        if (selectCurrency) selectCurrency.innerHTML = '<option value="">Selecciona moneda...</option>';
 
-  // --- FORMULARIO MONEDA (VALIDACIÓN AMIGABLE) ---
-  const formAddCurrency = document.getElementById('formAddCurrency');
-  if (formAddCurrency) {
-      formAddCurrency.addEventListener('submit', async function (e) {
-          e.preventDefault();
-          const fd = new FormData(this);
-          const payload = Object.fromEntries(fd.entries());
-          
-          const j = await fetchJSON(API + '?action=create_currency', { 
-              method: 'POST', 
-              body: JSON.stringify(payload), 
-              headers: { 'Content-Type': 'application/json' } 
-          });
+        items.forEach(c => {
+            const li = document.createElement('li');
+            li.className = 'list-group-item bg-transparent border-0 d-flex justify-content-between align-items-center p-3 mb-2 rounded-3 bg-body-secondary bg-opacity-25';
+            li.innerHTML = `
+                <div>
+                  <strong class="text-body">${c.currency_code}</strong>
+                  <div class="small text-muted">${c.currency_name}</div>
+                </div>
+                <div class="d-flex gap-1">
+                  <button class="btn btn-sm btn-outline-info border-0 btn-edit-currency" 
+                          data-id="${c.currency_id}" data-code="${c.currency_code}" data-name="${c.currency_name}">
+                    <i class="bi bi-pencil-square"></i>
+                  </button>
+                  <button class="btn btn-sm btn-outline-danger border-0 btn-delete-currency" data-id="${c.currency_id}">
+                    <i class="bi bi-trash-fill"></i>
+                  </button>
+                </div>
+            `;
+            currenciesListEl.appendChild(li);
 
-          if (!j.success) {
-              // Interceptamos el error de duplicado aquí
-              if (j.error && (j.error.includes("1062") || j.error.includes("Duplicate"))) {
-                  Swal.fire({
-                      icon: 'warning',
-                      title: 'Moneda ya existente',
-                      text: `El código "${payload.currency_code}" ya está registrado en el sistema.`,
-                      confirmButtonColor: '#3085d6'
-                  });
-              } else {
-                  showToast(j.message || 'Error al guardar', true);
-              }
-              return;
-          }
-
-          showToast('Moneda creada');
-          this.reset();
-          if (bsModalAddCurrency) bsModalAddCurrency.hide();
-          await loadCurrencies();
-      });
-  }
-
-  const formAddRate = document.getElementById('formAddRate');
-  if (formAddRate) {
-      formAddRate.addEventListener('submit', async function (e) {
-          e.preventDefault();
-          const fd = new FormData(this);
-          const payload = Object.fromEntries(fd.entries());
-          const j = await fetchJSON(API + '?action=create_rate', { 
-              method: 'POST', 
-              body: JSON.stringify(payload), 
-              headers: { 'Content-Type': 'application/json' } 
-          });
-          if (j.success) {
-              showToast('Tipo de cambio registrado');
-              this.reset();
-              if (bsModalAddRate) bsModalAddRate.hide();
-              await loadRates();
-          } else {
-              showToast(j.message, true);
-          }
-      });
-  }
-
-  // --- ELIMINACIÓN ---
-  async function onDeleteCurrencyClick() {
-    const id = this.dataset.id;
-
-    // Primero preguntamos si está seguro
-    const result = await Swal.fire({
-        title: '¿Estás seguro?',
-        text: "Si esta moneda tiene historial de tipos de cambio, el sistema podría bloquear la eliminación para proteger tus datos.",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Sí, intentar eliminar',
-        cancelButtonText: 'Cancelar',
-        buttonsStyling: false,
-        customClass: {
-            confirmButton: 'btn btn-danger',
-            cancelButton: 'btn btn-secondary ms-2'
-        }
-    });
-
-    if (!result.isConfirmed) return;
-
-    try {
-        const j = await fetchJSON(API + '?action=delete_currency', {
-            method: 'POST',
-            body: JSON.stringify({ currency_id: id }),
-            headers: { 'Content-Type': 'application/json' },
+            if (selectCurrency) {
+                const opt = document.createElement('option');
+                opt.value = c.currency_id;
+                opt.textContent = `${c.currency_code} - ${c.currency_name}`;
+                selectCurrency.appendChild(opt);
+            }
         });
 
-        if (!j.success) {
-            // AQUÍ BLOQUEAMOS SI HAY REGISTROS ASOCIADOS
-            // El error suele ser un "1451" en SQL (Cannot delete or update a parent row)
-            if (j.error && j.error.includes("1451")) {
-                return Swal.fire({
-                    icon: 'error',
-                    title: 'Acción Bloqueada',
-                    text: 'No puedes eliminar esta moneda porque tiene registros de tipos de cambio asociados. Para eliminarla, primero debes borrar su historial en la tabla de la derecha.',
-                    confirmButtonColor: '#3085d6'
-                });
-            }
-            throw new Error(j.message || 'Error al eliminar');
+        document.querySelectorAll('.btn-delete-currency').forEach(btn => btn.onclick = onDeleteCurrencyClick);
+        document.querySelectorAll('.btn-edit-currency').forEach(btn => btn.onclick = onEditCurrencyClick);
+    };
+
+    const renderRates = (items) => {
+        if (!ratesTbody) return;
+        ratesTbody.innerHTML = '';
+
+        if (items.length === 0) {
+            ratesTbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-muted">No se encontraron registros</td></tr>';
+            renderPaginationControls(0);
+            return;
         }
 
-        showToast('Moneda eliminada correctamente');
-        await loadCurrencies();
-        await loadRates();
+        const start = (currentPage - 1) * recordsPerPage;
+        const end = start + recordsPerPage;
+        const paginatedItems = items.slice(start, end);
 
-    } catch (err) {
-        Swal.fire('Error', err.message, 'error');
+        paginatedItems.forEach(r => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td class="ps-4 text-body">${r.rate_date}</td>
+                <td class="text-body"><strong>${r.currency_code}</strong></td>
+                <td><span class="badge bg-success-subtle text-success border border-success-subtle fs-6">$${Number(r.rate).toFixed(6)}</span></td>
+                <td class="small text-muted italic">${r.notes || ''}</td>
+                <td class="text-end pe-4">
+                  <button class="btn btn-sm btn-outline-info border me-1 btn-edit-rate" 
+                          data-id="${r.rate_id}" data-rate="${r.rate}" data-date="${r.rate_date}" data-notes="${r.notes || ''}">
+                    <i class="bi bi-pencil-square"></i>
+                  </button>
+                  <button class="btn btn-sm btn-outline-danger border btn-delete-rate" data-id="${r.rate_id}">
+                    <i class="bi bi-trash-fill"></i>
+                  </button>
+                </td>
+            `;
+            ratesTbody.appendChild(tr);
+        });
+
+        document.querySelectorAll('.btn-delete-rate').forEach(btn => btn.onclick = onDeleteRateClick);
+        document.querySelectorAll('.btn-edit-rate').forEach(btn => btn.onclick = onEditRateClick);
+        
+        renderPaginationControls(items.length);
+    };
+
+    const renderPaginationControls = (totalRecords) => {
+        let nav = document.getElementById('pagination-container');
+        if (!nav) {
+            nav = document.createElement('div');
+            nav.id = 'pagination-container';
+            nav.className = 'd-flex justify-content-between align-items-center px-4 py-3 border-top';
+            ratesTbody.closest('.card').appendChild(nav);
+        }
+        
+        if (totalRecords === 0) {
+            nav.innerHTML = '';
+            return;
+        }
+
+        const totalPages = Math.ceil(totalRecords / recordsPerPage) || 1;
+        nav.innerHTML = `
+            <div class="small text-muted">Página ${currentPage} de ${totalPages}</div>
+            <div class="btn-group">
+                <button class="btn btn-sm btn-outline-secondary" ${currentPage === 1 ? 'disabled' : ''} id="prevPage">Anterior</button>
+                <button class="btn btn-sm btn-outline-secondary" ${currentPage === totalPages ? 'disabled' : ''} id="nextPage">Siguiente</button>
+            </div>
+        `;
+
+        const prevBtn = document.getElementById('prevPage');
+        const nextBtn = document.getElementById('nextPage');
+
+        if(prevBtn) prevBtn.onclick = () => { currentPage--; renderRates(allRates); };
+        if(nextBtn) nextBtn.onclick = () => { currentPage++; renderRates(allRates); };
+    };
+
+    // ==========================================
+    // 2. EDICIÓN
+    // ==========================================
+
+    async function onEditCurrencyClick() {
+        const { id, code, name } = this.dataset;
+        const { value: formValues } = await Swal.fire({
+            title: 'Editar Moneda',
+            background: '#1e1e1e', color: '#fff',
+            html: `
+                <div class="text-start p-2">
+                    <label class="small mb-1">Código</label>
+                    <input id="swal-code" class="form-control bg-dark text-white border-secondary mb-3" value="${code}">
+                    <label class="small mb-1">Nombre</label>
+                    <input id="swal-name" class="form-control bg-dark text-white border-secondary" value="${name}">
+                </div>`,
+            showCancelButton: true,
+            confirmButtonText: 'Actualizar',
+            preConfirm: () => [document.getElementById('swal-code').value, document.getElementById('swal-name').value]
+        });
+
+        if (formValues) {
+            const res = await fetch(`${API}?action=update_currency`, {
+                method: 'POST',
+                body: JSON.stringify({ currency_id: id, currency_code: formValues[0], currency_name: formValues[1] }),
+                headers: { 'Content-Type': 'application/json' }
+            });
+            
+            const response = await res.json();
+
+            if (response.success) { 
+                loadCurrencies(); // Actualiza la lista de la izquierda
+                loadRates();      // <--- ESTA LÍNEA FALTABA: Actualiza la tabla de tasas
+                Swal.fire('Éxito', 'Moneda actualizada', 'success'); 
+            }
+        }
     }
-}
 
-  async function onDeleteRateClick() {
-      const id = this.dataset.id;
-      const res = await Swal.fire({ title: '¿Eliminar registro?', icon: 'warning', showCancelButton: true });
-      if (!res.isConfirmed) return;
-      const j = await fetchJSON(API + '?action=delete_rate', {
-          method: 'POST',
-          body: JSON.stringify({ rate_id: id }),
-          headers: { 'Content-Type': 'application/json' }
-      });
-      if (j.success) { showToast('Registro eliminado'); loadRates(); }
-  }
+    async function onEditRateClick() {
+        const { id, rate, date, notes } = this.dataset;
+        const { value: f } = await Swal.fire({
+            title: 'Editar Registro',
+            background: '#1e1e1e', color: '#fff',
+            html: `
+                <div class="text-start p-2">
+                    <label class="small mb-1 text-muted">Tasa</label>
+                    <input id="sw-rate" type="number" step="0.000001" class="form-control bg-dark text-white border-secondary mb-3" value="${rate}">
+                    <label class="small mb-1 text-muted">Fecha</label>
+                    <input id="sw-date" type="date" class="form-control bg-dark text-white border-secondary mb-3" value="${date}">
+                    <label class="small mb-1 text-muted">Notas</label>
+                    <textarea id="sw-notes" class="form-control bg-dark text-white border-secondary">${notes}</textarea>
+                </div>`,
+            showCancelButton: true,
+            confirmButtonText: 'Guardar',
+            preConfirm: () => ({ rate: document.getElementById('sw-rate').value, date: document.getElementById('sw-date').value, notes: document.getElementById('sw-notes').value })
+        });
 
-  // --- EXPORTACIONES ---
-  function getTableData() {
-      const rows = Array.from(ratesTbody.querySelectorAll('tr'));
-      return rows.map(tr => {
-          const tds = tr.querySelectorAll('td');
-          if (tds.length < 4) return null;
-          return [tds[0].innerText, tds[1].innerText, tds[2].innerText, tds[3].innerText];
-      }).filter(x => x !== null);
-  }
+        if (f) {
+            const res = await fetch(`${API}?action=update_rate`, {
+                method: 'POST',
+                body: JSON.stringify({ rate_id: id, rate: f.rate, rate_date: f.date, notes: f.notes }),
+                headers: { 'Content-Type': 'application/json' }
+            });
+            if ((await res.json()).success) { loadRates(); Swal.fire('Éxito', 'Registro actualizado', 'success'); }
+        }
+    }
 
-  document.getElementById('exportCSVBtn')?.addEventListener('click', () => {
-      const data = getTableData();
-      let csv = 'Fecha,Moneda,Valor,Notas\n';
-      data.forEach(r => csv += `"${r[0]}","${r[1]}","${r[2]}","${r[3]}"\n`);
-      const blob = new Blob([csv], { type: 'text/csv' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob); a.download = 'tasas.csv'; a.click();
-  });
+    // ==========================================
+    // 3. ELIMINACIÓN (CON PROTECCIÓN)
+    // ==========================================
 
-  document.getElementById('exportPDFBtn')?.addEventListener('click', () => {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      doc.text("Reporte de Tasas", 14, 15);
-      doc.autoTable({ head: [['Fecha', 'Moneda', 'Valor', 'Notas']], body: getTableData(), startY: 20 });
-      doc.save('reporte.pdf');
-  });
+    async function onDeleteCurrencyClick() {
+        const id = this.dataset.id;
+        const nombreMoneda = this.closest('li').querySelector('strong').innerText;
 
-  function escapeHtml(str = '') {
-      return String(str).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  }
+        const confirm = await Swal.fire({
+            title: '¿Eliminar Moneda?',
+            text: `Se verificará si ${nombreMoneda} tiene historial.`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Eliminar',
+            customClass: { confirmButton: 'btn btn-danger', cancelButton: 'btn btn-secondary ms-2' },
+            buttonsStyling: false
+        });
+        if (!confirm.isConfirmed) return;
 
-  loadCurrencies();
-  loadRates();
+        const res = await fetch(`${API}?action=delete_currency`, {
+            method: 'POST',
+            body: JSON.stringify({ currency_id: id }),
+            headers: { 'Content-Type': 'application/json' }
+        });
+        
+        const j = await res.json();
+        
+        if (j.success) {
+            loadCurrencies(); 
+            // Si la moneda borrada afectaba la lista de tasas, recargamos
+            loadRates();
+            Swal.fire('Eliminado', 'La moneda ha sido eliminada.', 'success');
+        } else {
+            // AQUÍ SALTA EL ERROR SI TIENE HISTORIAL
+            Swal.fire('Error', 'No se puede eliminar porque tiene historial de tasas registrado.', 'error');
+        }
+    }
+
+    async function onDeleteRateClick() {
+        const id = this.dataset.id;
+        const confirm = await Swal.fire({
+            title: '¿Borrar este registro?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Eliminar',
+            customClass: { confirmButton: 'btn btn-danger', cancelButton: 'btn btn-secondary ms-2' },
+            buttonsStyling: false
+        });
+        if (!confirm.isConfirmed) return;
+
+        const res = await fetch(`${API}?action=delete_rate`, {
+            method: 'POST',
+            body: JSON.stringify({ rate_id: id }),
+            headers: { 'Content-Type': 'application/json' }
+        });
+        if ((await res.json()).success) loadRates();
+    }
+
+    // ==========================================
+    // 4. EXPORTACIÓN e INICIALIZACIÓN
+    // ==========================================
+
+    const exportData = async (type) => {
+        // Usamos allRates que ya contiene los datos filtrados del servidor
+        if (!allRates || !allRates.length) return Swal.fire('Info', 'No hay datos visibles para exportar', 'info');
+
+        const formatted = allRates.map(r => ({ Fecha: r.rate_date, Moneda: r.currency_code, Tasa: r.rate, Notas: r.notes || '' }));
+
+        if (type === 'pdf') {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.text("Historial de Tasas", 14, 15);
+            doc.autoTable({ head: [['Fecha', 'Moneda', 'Tasa', 'Notas']], body: formatted.map(d => [d.Fecha, d.Moneda, d.Tasa, d.Notas]), startY: 20 });
+            doc.save('Historial_Tasas.pdf');
+        } else {
+            const ws = XLSX.utils.json_to_sheet(formatted);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Tasas");
+            XLSX.writeFile(wb, `Historial_Tasas.${type === 'excel' ? 'xlsx' : 'csv'}`);
+        }
+    };
+
+    document.getElementById('exportPDFBtn')?.addEventListener('click', () => exportData('pdf'));
+    document.getElementById('exportExcelBtn')?.addEventListener('click', () => exportData('excel'));
+    document.getElementById('exportCSVBtn')?.addEventListener('click', () => exportData('csv'));
+
+    // CARGA PRINCIPAL (MODIFICADA PARA FILTROS)
+    async function loadRates() {
+        let url = `${API}?action=list_rates`;
+        if (currentStart) url += `&start=${currentStart}`;
+        if (currentEnd) url += `&end=${currentEnd}`;
+
+        const res = await fetch(url);
+        const j = await res.json();
+        if (j.success) { 
+            allRates = j.data; 
+            // Si filtramos, queremos ver la página 1
+            renderRates(allRates); 
+        }
+    }
+
+    async function loadCurrencies() {
+        const res = await fetch(`${API}?action=list_currencies`);
+        const j = await res.json();
+        if (j.success) renderCurrencies(j.data);
+    }
+
+    // Listeners Formularios
+    document.getElementById('formAddCurrency')?.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        const res = await fetch(`${API}?action=create_currency`, {
+            method: 'POST',
+            body: JSON.stringify(Object.fromEntries(new FormData(this))),
+            headers: { 'Content-Type': 'application/json' }
+        });
+        if ((await res.json()).success) { this.reset(); bootstrap.Modal.getInstance(document.getElementById('modalAddCurrency')).hide(); loadCurrencies(); }
+    });
+
+    document.getElementById('formAddRate')?.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        const res = await fetch(`${API}?action=create_rate`, {
+            method: 'POST',
+            body: JSON.stringify(Object.fromEntries(new FormData(this))),
+            headers: { 'Content-Type': 'application/json' }
+        });
+        if ((await res.json()).success) { this.reset(); bootstrap.Modal.getInstance(document.getElementById('modalAddRate')).hide(); loadRates(); }
+    });
+
+    // ==========================================
+    // 5. NUEVA LÓGICA DE FILTRADO (SERVER-SIDE)
+    // ==========================================
+    
+    // Función central para actualizar variables y recargar
+    const applyFilters = () => {
+        currentStart = document.getElementById('filter-date-start').value;
+        currentEnd = document.getElementById('filter-date-end').value;
+        currentPage = 1; // Reseteamos paginación al filtrar
+        loadRates();     // Pedimos datos nuevos al servidor
+    };
+
+    // Eventos 'change' para que busque al momento de seleccionar fecha
+    document.getElementById('filter-date-start')?.addEventListener('change', applyFilters);
+    document.getElementById('filter-date-end')?.addEventListener('change', applyFilters);
+
+    // Botón Limpiar
+    document.getElementById('btn-clear-filter')?.addEventListener('click', () => {
+        document.getElementById('filter-date-start').value = '';
+        document.getElementById('filter-date-end').value = '';
+        currentStart = '';
+        currentEnd = '';
+        currentPage = 1;
+        loadRates();
+    });
+
+    // Carga inicial
+    loadCurrencies();
+    loadRates();
 });

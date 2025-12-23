@@ -4,7 +4,7 @@ require_once __DIR__ . '/../inc/auth_check.php';
 
 // Determinamos nivel de acceso
 $isAdmin = (isset($_SESSION['user']['level_user']) && $_SESSION['user']['level_user'] == 1);
-$username = htmlspecialchars($_SESSION['user']['username']);
+$username = htmlspecialchars($_SESSION['user']['username'] ?? '');
 
 // Inicia el buffer
 ob_start();
@@ -22,12 +22,12 @@ $uri = $_GET['url'] ?? 'dashboard';
 $segment = explode('/', trim($uri, '/'))[0];
 ?>
 
-<div class="container-fluid m-0 p-0 min-vh-100" data-bs-theme="auto">
+<div class="container-fluid m-0 p-0 min-vh-100 bg-body-tertiary" data-bs-theme="auto">
     <div class="row g-0">
 
         <?php require_once __DIR__ . '/../partials/layouts/laterals_menus/lateral_menu_dashboard.php'; ?>
 
-        <main class="col-12 col-md-10 bg-body-tertiary">
+        <main class="col-12 col-md-10">
 
             <div class="bg-body shadow-sm border-bottom">
                 <div class="container-fluid px-4 py-3">
@@ -41,9 +41,10 @@ $segment = explode('/', trim($uri, '/'))[0];
                             <h4 class="mb-0 fw-bold">Panel de Control</h4>
                             <p class="text-muted small mb-0">Gestión general del inventario y sistema</p>
                         </div>
+                        
                         <div class="d-md-none">
-                            <button class="btn btn-outline-primary border-2 rounded-circle" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileMenu">
-                                <i class="fas fa-bars"></i>
+                            <button class="btn btn-outline-primary border-2 rounded-3 shadow-sm px-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileMenu">
+                                <i class="bi bi-list fs-4"></i>
                             </button>
                         </div>
                     </div>
@@ -114,69 +115,78 @@ $segment = explode('/', trim($uri, '/'))[0];
                 </div>
 
                 <div class="card shadow-lg border-0 rounded-4">
-                <div class="card-header p-4 bg-transparent border-bottom-0">
-    <div class="row align-items-center g-3">
-        <div class="col-md-6">
-            <h5 class="mb-1 fw-bold"><i class="fas fa-history me-2 text-primary"></i>Actividad Reciente</h5>
-            <p class="text-muted small mb-0">Últimos movimientos realizados en el sistema</p>
-        </div>
-        
-        <div class="col-md-6 text-md-end">
-            <div class="d-flex gap-2 justify-content-md-end">
-                <div class="input-group input-group-sm w-auto shadow-sm">
-                    <span class="input-group-text bg-body border-end-0"><i class="fas fa-search text-muted"></i></span>
-                    <input type="text" id="table-search" class="form-control border-start-0" placeholder="Filtrar actividad...">
-                </div>
+                    <div class="card-header p-4 bg-transparent border-bottom-0">
+                        <div class="row align-items-center g-3">
+                            <div class="col-md-6">
+                                <h5 class="mb-1 fw-bold"><i class="fas fa-history me-2 text-primary"></i>Actividad Reciente</h5>
+                                <p class="text-muted small mb-0">Últimos movimientos realizados en el sistema</p>
+                            </div>
+                            
+                            <div class="col-md-6 text-md-end">
+                                <div class="d-flex gap-2 justify-content-md-end">
+                                    <div class="input-group input-group-sm w-auto shadow-sm">
+                                        <span class="input-group-text bg-body border-end-0"><i class="fas fa-search text-muted"></i></span>
+                                        <input type="text" id="table-search" class="form-control border-start-0" placeholder="Filtrar actividad...">
+                                    </div>
 
-                <div class="dropdown">
-                    <button class="btn btn-outline-secondary btn-sm dropdown-toggle rounded-3 px-3 shadow-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fas fa-file-export me-1"></i> Exportar
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-3">
-                        <li><h6 class="dropdown-header fw-bold text-uppercase small opacity-50">Formatos Disponibles</h6></li>
-                        
-                        <li><button id="exportCSVBtn" class="dropdown-item d-flex align-items-center py-2">
-                            <i class="fas fa-file-csv text-success me-3 fs-5"></i> CSV
-                        </button></li>
-                        
-                        <li><button id="exportExcelBtn" class="dropdown-item d-flex align-items-center py-2">
-                            <i class="fas fa-file-excel text-success me-3 fs-5"></i> Excel
-                        </button></li>
-                        
-                        <li><button id="exportPDFBtn" class="dropdown-item d-flex align-items-center py-2">
-                            <i class="fas fa-file-pdf text-danger me-3 fs-5"></i> PDF
-                        </button></li>
-                        
-                        <li><button id="exportJSONBtn" class="dropdown-item d-flex align-items-center py-2">
-                            <i class="fas fa-file-code text-info me-3 fs-5"></i> JSON
-                        </button></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+                                    <div class="dropdown">
+                                        <button class="btn btn-outline-secondary btn-sm dropdown-toggle rounded-3 px-3 shadow-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="fas fa-file-export me-1"></i> Exportar
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-3">
+                                            <li><h6 class="dropdown-header fw-bold text-uppercase small opacity-50">Formatos Disponibles</h6></li>
+                                            <li><button id="exportCSVBtn" class="dropdown-item d-flex align-items-center py-2"><i class="fas fa-file-csv text-success me-3 fs-5"></i> CSV</button></li>
+                                            <li><button id="exportExcelBtn" class="dropdown-item d-flex align-items-center py-2"><i class="fas fa-file-excel text-success me-3 fs-5"></i> Excel</button></li>
+                                            <li><button id="exportPDFBtn" class="dropdown-item d-flex align-items-center py-2"><i class="fas fa-file-pdf text-danger me-3 fs-5"></i> PDF</button></li>
+                                            <li><button id="exportJSONBtn" class="dropdown-item d-flex align-items-center py-2"><i class="fas fa-file-code text-info me-3 fs-5"></i> JSON</button></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
                     <div class="card-body p-0">
-                        <div id="recent-activity-table" class="border-top"></div>
+                        <div id="recent-activity-table" class="border-top" style="min-height: 300px;"></div>
                     </div>
                 </div>
             </div>
-        </main>
-    </div>
-</div>
 
-<div class="offcanvas offcanvas-start d-md-none border-0 shadow" tabindex="-1" id="mobileMenu">
-    <div class="offcanvas-header bg-primary text-white py-4">
-        <h5 class="offcanvas-title fw-bold"><i class="fas fa-boxes me-2"></i>Inventario Pro</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
-    </div>
-    <div class="offcanvas-body p-0 bg-body">
-        <div class="list-group list-group-flush pt-3">
-            <a href="<?= BASE_URL ?>dashboard" class="list-group-item list-group-item-action border-0 px-4 py-3 <?= $segment === 'dashboard' ? 'active' : '' ?>">
-                <i class="fas fa-tachometer-alt me-3"></i>Dashboard
-            </a>
+            <div class="offcanvas offcanvas-start" tabindex="-1" id="mobileMenu" aria-labelledby="mobileMenuLabel">
+                <div class="offcanvas-header border-bottom">
+                    <h5 class="offcanvas-title fw-bold" id="mobileMenuLabel">
+                        <i class="bi bi-grid-fill text-primary me-2"></i>Sistema
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                </div>
+                <div class="offcanvas-body p-0">
+                    <div class="list-group list-group-flush mt-2">
+                        
+                        <a href="<?= BASE_URL ?>dashboard" class="list-group-item list-group-item-action border-0 py-3 px-4 d-flex align-items-center bg-primary-subtle text-primary border-start border-4 border-primary">
+                            <i class="bi bi-speedometer2 me-3 fs-5"></i> 
+                            <span class="fw-bold">Panel de Control</span>
+                        </a>
+
+                        <a href="<?= BASE_URL ?>settings" class="list-group-item list-group-item-action border-0 py-3 px-4 d-flex align-items-center">
+                            <i class="bi bi-gear me-3 fs-5 text-secondary"></i> 
+                            <span class="fw-medium">Configuración</span>
+                        </a>
+
+                        <a href="<?= BASE_URL ?>exchange_rates" class="list-group-item list-group-item-action border-0 py-3 px-4 d-flex align-items-center">
+                            <i class="fas fa-coins me-3 fs-5 text-secondary"></i> 
+                            <span class="fw-medium">Tipo de Cambio</span>
+                        </a>
+
+                    </div>
+                    
+                    <div class="mt-auto border-top p-3 text-center">
+                        <small class="text-muted">Conectado como:</small><br>
+                        <strong><?= $username ?></strong>
+                    </div>
+                </div>
             </div>
+
+        </main>
     </div>
 </div>
 

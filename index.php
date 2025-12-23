@@ -51,4 +51,4 @@ if (!empty($parts[0]) && preg_match('/^[a-zA-Z0-9_]+$/', $parts[0])) {
 }
 
 // Pie de página HTML y scripts comunes
-include __DIR__ . '/views/partials/footer.php';
+//include __DIR__ . '/views/partials/footer.php';

@@ -1,90 +1,75 @@
 <?php
-// api/exchange_rates.php
 header('Content-Type: application/json; charset=utf-8');
 if (session_status() === PHP_SESSION_NONE) session_start();
 
 require_once __DIR__ . '/../models/Database.php';
 require_once __DIR__ . '/../models/ExchangeRateModel.php';
+require_once __DIR__ . '/../controllers/Logger.php';
 
-$pdo = (new Database())->getConnection();
-$model = new ExchangeRateModel($pdo);
-
-$action = $_GET['action'] ?? ($_POST['action'] ?? 'list');
+$model = new ExchangeRateModel();
+$action = $_GET['action'] ?? '';
+$user_id = $_SESSION['user']['user_id'] ?? 0;
 
 try {
-    if ($action === 'list_currencies') {
-        echo json_encode(['success' => true, 'data' => $model->getCurrencies()]);
-        exit;
+    $raw = file_get_contents('php://input');
+    $input = json_decode($raw, true) ?? $_POST;
+
+    switch ($action) {
+        case 'list_currencies':
+            echo json_encode(['success' => true, 'data' => $model->getCurrencies()]);
+            break;
+
+        case 'list_rates':
+            // 1. Recibir parámetros GET para el filtro
+            $start = $_GET['start'] ?? null;
+            $end   = $_GET['end'] ?? null;
+            // Pasamos los filtros al modelo
+            echo json_encode(['success' => true, 'data' => $model->getRates(1000, $start, $end)]);
+            break;
+
+        case 'create_currency':
+            $id = $model->createCurrency($input['currency_code'], $input['currency_name'], $input['country'] ?? '');
+            Logger::logAction($user_id, "Creó moneda: " . strtoupper($input['currency_code']));
+            echo json_encode(['success' => true, 'id' => $id]);
+            break;
+
+        case 'update_currency':
+            $res = $model->updateCurrency((int)$input['currency_id'], $input['currency_code'], $input['currency_name']);
+            Logger::logAction($user_id, "Actualizó moneda ID: " . $input['currency_id']);
+            echo json_encode(['success' => $res]);
+            break;
+
+        case 'create_rate':
+            $id = $model->createRate((int)$input['currency_id'], $input['rate'], $input['rate_date'], $input['notes'] ?? '');
+            Logger::logAction($user_id, "Registró tasa para Moneda ID: {$input['currency_id']}");
+            echo json_encode(['success' => true, 'id' => $id]);
+            break;
+
+        case 'update_rate':
+            $res = $model->updateRate((int)$input['rate_id'], (float)$input['rate'], $input['rate_date'], $input['notes'] ?? '');
+            Logger::logAction($user_id, "Actualizó registro de tasa ID: " . $input['rate_id']);
+            echo json_encode(['success' => $res]);
+            break;
+
+        case 'delete_currency':
+            // 2. Intentar eliminar. Si el modelo devuelve false, es porque tiene datos.
+            if ($model->deleteCurrency($input['currency_id'])) {
+                Logger::logAction($user_id, "Eliminó moneda ID: " . $input['currency_id']);
+                echo json_encode(['success' => true]);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'No se puede eliminar: tiene historial de tasas.']);
+            }
+            break;
+
+        case 'delete_rate':
+            $model->deleteRate($input['rate_id']);
+            Logger::logAction($user_id, "Eliminó tasa ID: " . $input['rate_id']);
+            echo json_encode(['success' => true]);
+            break;
+
+        default:
+            echo json_encode(['success' => false, 'message' => 'Acción no válida']);
     }
-
-    if ($action === 'list_rates') {
-        $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 500;
-        echo json_encode(['success' => true, 'data' => $model->getRates($limit)]);
-        exit;
-    }
-
-    // leer input (POST o JSON raw)
-    $input = $_POST;
-    if (empty($input)) {
-        $raw = file_get_contents('php://input');
-        if ($raw) {
-            $json = json_decode($raw, true);
-            if (json_last_error() === JSON_ERROR_NONE) $input = $json;
-        }
-    }
-
-    if ($action === 'create_currency') {
-        $code = strtoupper(trim($input['currency_code'] ?? ''));
-        $name = trim($input['currency_name'] ?? '');
-        $country = trim($input['country'] ?? '');
-        if ($code === '' || $name === '' || $country === '') {
-            echo json_encode(['success' => false, 'message' => 'Faltan campos']);
-            exit;
-        }
-        $id = $model->createCurrency($code, $name, $country);
-        echo json_encode(['success' => true, 'id' => $id, 'currency' => $model->getCurrency($id)]);
-        exit;
-    }
-
-    if ($action === 'create_rate') {
-        $currency_id = (int)($input['currency_id'] ?? 0);
-        $rate = $input['rate'] ?? null;
-        $rate_date = $input['rate_date'] ?? null;
-        $notes = $input['notes'] ?? null;
-
-        if ($currency_id <= 0 || $rate === null || !$rate_date) {
-            echo json_encode(['success' => false, 'message' => 'Faltan campos para tipo de cambio']);
-            exit;
-        }
-        if (!is_numeric($rate)) {
-            echo json_encode(['success' => false, 'message' => 'Tipo debe ser numérico']);
-            exit;
-        }
-
-        $id = $model->createRate($currency_id, $rate, $rate_date, $notes);
-        echo json_encode(['success' => true, 'id' => $id]);
-        exit;
-    }
-
-    if ($action === 'delete_currency') {
-        $id = (int)($input['currency_id'] ?? 0);
-        if ($id <= 0) { echo json_encode(['success' => false, 'message' => 'ID inválido']); exit; }
-        $ok = $model->deleteCurrency($id);
-        echo json_encode(['success' => (bool)$ok]);
-        exit;
-    }
-
-    if ($action === 'delete_rate') {
-        $id = (int)($input['rate_id'] ?? 0);
-        if ($id <= 0) { echo json_encode(['success' => false, 'message' => 'ID inválido']); exit; }
-        $ok = $model->deleteRate($id);
-        echo json_encode(['success' => (bool)$ok]);
-        exit;
-    }
-
-    echo json_encode(['success' => false, 'message' => 'Acción no definida']);
-} catch (PDOException $e) {
-    http_response_code(500);
-    echo json_encode(['success' => false, 'message' => 'Error BD', 'error' => $e->getMessage()]);
+} catch (Exception $e) {
+    echo json_encode(['success' => false, 'message' => 'Error de operación', 'error' => $e->getMessage()]);
 }
-
