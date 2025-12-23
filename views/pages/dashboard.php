@@ -159,29 +159,54 @@ $segment = explode('/', trim($uri, '/'))[0];
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
                 </div>
-                <div class="offcanvas-body p-0">
+                
+                <div class="offcanvas-body p-0 d-flex flex-column h-100">
                     <div class="list-group list-group-flush mt-2">
-                        
-                        <a href="<?= BASE_URL ?>dashboard" class="list-group-item list-group-item-action border-0 py-3 px-4 d-flex align-items-center bg-primary-subtle text-primary border-start border-4 border-primary">
-                            <i class="bi bi-speedometer2 me-3 fs-5"></i> 
-                            <span class="fw-bold">Panel de Control</span>
-                        </a>
+                        <?php 
+                        $menuToRender = $menuItems ?? [];
+                        if (!empty($menuToRender)): 
+                            foreach ($menuToRender as $route => $item): 
+                                $isActiveParent = ($segment === $route);
+                                $isSubActive = isset($item['submenu']) && array_key_exists($segment, $item['submenu']);
+                                $itemIcon = htmlspecialchars($item['icon'] ?? 'circle');
+                                $itemLabel = htmlspecialchars($item['label'] ?? $route);
+                        ?>
+                                <a href="<?= BASE_URL . $route ?>" 
+                                   class="list-group-item list-group-item-action border-0 py-3 px-4 d-flex align-items-center <?= ($isActiveParent || $isSubActive) ? 'bg-primary-subtle text-primary border-start border-4 border-primary fw-bold' : 'text-body' ?>">
+                                    <i class="bi bi-<?= $itemIcon ?> me-3 fs-5"></i> 
+                                    <?= $itemLabel ?>
+                                </a>
 
-                        <a href="<?= BASE_URL ?>settings" class="list-group-item list-group-item-action border-0 py-3 px-4 d-flex align-items-center">
-                            <i class="bi bi-gear me-3 fs-5 text-secondary"></i> 
-                            <span class="fw-medium">Configuración</span>
-                        </a>
-
-                        <a href="<?= BASE_URL ?>exchange_rates" class="list-group-item list-group-item-action border-0 py-3 px-4 d-flex align-items-center">
-                            <i class="fas fa-coins me-3 fs-5 text-secondary"></i> 
-                            <span class="fw-medium">Tipo de Cambio</span>
-                        </a>
-
+                                <?php if (isset($item['submenu'])): ?>
+                                    <div class="bg-body-tertiary shadow-inner">
+                                        <?php foreach ($item['submenu'] as $subRoute => $subItem): 
+                                            $isSubItemActive = ($segment === $subRoute);
+                                            $subIcon = htmlspecialchars($subItem['icon'] ?? 'circle');
+                                            $subLabel = htmlspecialchars($subItem['label'] ?? $subRoute);
+                                        ?>
+                                            <a href="<?= BASE_URL . $subRoute ?>" 
+                                               class="list-group-item list-group-item-action border-0 py-2 ps-5 d-flex align-items-center <?= $isSubItemActive ? 'text-primary fw-bold' : 'text-muted' ?>" style="font-size: 0.85rem;">
+                                                <i class="bi bi-<?= $subIcon ?> me-3 fs-6"></i> 
+                                                <?= $subLabel ?>
+                                            </a>
+                                        <?php endforeach; ?>
+                                    </div>
+                                <?php endif; ?>
+                        <?php 
+                            endforeach; 
+                        else: 
+                        ?>
+                            <div class="p-4 text-center text-muted">
+                                <small>No se pudo cargar el menú dinámico.</small>
+                            </div>
+                        <?php endif; ?>
                     </div>
                     
-                    <div class="mt-auto border-top p-3 text-center">
-                        <small class="text-muted">Conectado como:</small><br>
-                        <strong><?= $username ?></strong>
+                    <div class="mt-auto border-top p-4 text-center">
+                        <small class="text-muted d-block mb-1">Usuario conectado:</small>
+                        <span class="badge border px-3 py-2 rounded-pill shadow-sm text-body">
+                            <i class="bi bi-person-circle text-primary me-2"></i><?= htmlspecialchars($username) ?>
+                        </span>
                     </div>
                 </div>
             </div>
