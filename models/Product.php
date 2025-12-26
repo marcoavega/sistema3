@@ -278,4 +278,60 @@ class Product
             return ['success' => false, 'message' => 'Error al eliminar producto: ' . $e->getMessage()];
         }
     }
+
+
+
+    // AGREGAR ESTO A TU CLASE Product:
+    
+    // Obtener stock desglosado por almacén
+    public function getStockByWarehouse($productId) 
+    {
+        try {
+            // 1. Obtener lista de todos los almacenes activos
+            // Asumo que tu tabla se llama 'warehouses'
+            $whs = $this->db->query("SELECT warehouse_id, name FROM warehouses ORDER BY warehouse_id ASC")->fetchAll(PDO::FETCH_ASSOC);
+            
+            // 2. Verificar si existe la tabla de stock intermedia
+            // A veces se llama 'warehouse_stock' o 'product_stock' según tu BD. Ajusta el nombre si es necesario.
+            $table = null;
+            
+            // Verificamos si existe 'warehouse_stock'
+            try {
+                $check = $this->db->query("SELECT 1 FROM warehouse_stock LIMIT 1");
+                $table = 'warehouse_stock';
+            } catch (Exception $e) {
+                // Si falla, intentamos con 'product_stock' u otra lógica que manejes
+                // Si no usas stock por almacén en BD, dejaremos $table en null
+            }
+
+            if ($table) {
+                // Consulta: Une los almacenes con el stock de ese producto específico
+                $sql = "SELECT w.warehouse_id, w.name AS warehouse_name, COALESCE(s.stock, 0) AS stock
+                        FROM warehouses w
+                        LEFT JOIN {$table} s ON s.warehouse_id = w.warehouse_id AND s.product_id = :product_id
+                        ORDER BY w.warehouse_id ASC";
+                
+                $stmt = $this->db->prepare($sql);
+                $stmt->bindValue(':product_id', $productId, PDO::PARAM_INT);
+                $stmt->execute();
+                return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            } else {
+                // Si no hay tabla de stock por almacén, devolvemos 0 para todos
+                $result = [];
+                foreach ($whs as $w) {
+                    $result[] = [
+                        'warehouse_id' => $w['warehouse_id'], 
+                        'warehouse_name' => $w['name'], 
+                        'stock' => 0 // O podrías poner el stock general dividido, pero mejor 0
+                    ];
+                }
+                return $result;
+            }
+        } catch (PDOException $e) {
+            error_log("Product::getStockByWarehouse Error: " . $e->getMessage());
+            return [];
+        }
+    }
+
+
 }
