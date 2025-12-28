@@ -1,5 +1,5 @@
 <?php
-
+//Controllers/RouteController.php
 // Definición de la clase `RouteController`, encargada de gestionar la carga de páginas dinámicas.
 class RouteController {
 
