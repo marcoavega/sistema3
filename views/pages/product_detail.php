@@ -1,128 +1,101 @@
 <?php
-//Archivo: views/pages/product_detail.php
+// =======================================================
+// Archivo: views/pages/product_detail.php
+// =======================================================
+// Esta vista se encarga de mostrar el detalle de un producto específico.
+// Incluye validaciones de sesión, validación de ID,
+// consultas a base de datos y preparación de datos
+// para ser usados en el HTML de la vista.
+// =======================================================
 
-// Verifica si el usuario está logueado, si no, redirige
+
+// -------------------------------------------------------
+// Verificación de autenticación del usuario
+// -------------------------------------------------------
+// Se incluye el archivo que valida si el usuario
+// tiene una sesión activa.
+// Si el usuario NO está autenticado, este archivo
+// normalmente redirige al login y detiene la ejecución.
 require_once __DIR__ . '/../inc/auth_check.php';
 
+
+// -------------------------------------------------------
+// Obtención de la URL lógica enviada por el sistema
+// -------------------------------------------------------
+// Se obtiene el parámetro 'url' desde $_GET.
+// Si no existe, se asigna 'product_detail' como valor por defecto.
 $uri = $_GET['url'] ?? 'product_detail';
+
+
+// -------------------------------------------------------
+// Extracción del primer segmento de la URL
+// -------------------------------------------------------
+// 1. trim($uri, '/') elimina barras al inicio y final
+// 2. explode('/', ...) separa la URL en segmentos
+// 3. [0] obtiene el primer segmento
+// NOTA: Esta variable actualmente no se usa más adelante,
+// pero puede servir para validaciones o lógica futura.
 $segment = explode('/', trim($uri, '/'))[0];
 
+
+// -------------------------------------------------------
+// Validación del parámetro ID del producto
+// -------------------------------------------------------
+// Se verifica:
+// - Que el parámetro 'id' exista
+// - Que sea numérico
+// Si no cumple, se redirige a la página product_not_found
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
   header("Location: " . BASE_URL . "product_not_found");
   exit();
 }
 
+
+// -------------------------------------------------------
+// Conversión segura del ID del producto
+// -------------------------------------------------------
+// Se fuerza el ID a entero para mayor seguridad
+// y evitar inyecciones o valores inválidos.
 $product_id = (int) $_GET['id'];
 
+
+// -------------------------------------------------------
+// Activación del buffer de salida
+// -------------------------------------------------------
+// Permite usar header() sin errores aunque
+// luego se genere salida HTML.
 ob_start();
-require_once __DIR__ . '/../../models/Database.php';
 
-try {
-  $pdo = (new Database())->getConnection();
+//require_once __DIR__ . '/../../models/ProductDetailModel.php';
+require_once __DIR__ . '/../../models/ProductDetailModel.php';
+$pdo = (new Database())->getConnection();
 
-  $stmt = $pdo->prepare("\n    SELECT 
-        product_id,
-        product_code,
-        barcode,
-        product_name,
-        product_description,
-        location,
-        price,
-        stock,
-        registration_date,
-        category_id,
-        supplier_id,
-        unit_id,
-        currency_id,
-        image_url,
-        subcategory_id,
-        desired_stock,
-        status,
-        sale_price,
-        weight,
-        height,
-        length,
-        width,
-        diameter,
-        updated_at
-    FROM products
-    WHERE product_id = :product_id
-    LIMIT 1
-  ");
-  $stmt->execute(['product_id' => $product_id]);
-  $product = $stmt->fetch(PDO::FETCH_ASSOC);
+$model = new ProductDetailModel();
+$data = $model->getProductDetail($product_id);
 
-  if (!$product) {
+if (!$data) {
     header("Location: " . BASE_URL . "product_not_found");
     exit();
-  }
-
-  // --- OBTENER LISTA DE ALMACENES ---
-  try {
-    $whs = $pdo->query("SELECT warehouse_id, name FROM warehouses ORDER BY warehouse_id")->fetchAll(PDO::FETCH_ASSOC);
-  } catch (Exception $e) {
-    $whs = [];
-  }
-
-  // --- OBTENER STOCK POR ALMACÉN (si existe tabla) ---
-  try {
-    $table = null;
-    $warehouse_col_product = 'product_id';
-    $warehouse_col_warehouse = 'warehouse_id';
-
-    $res = $pdo->query("SHOW TABLES LIKE 'warehouse_stock'")->fetch(PDO::FETCH_NUM);
-    if ($res) {
-      $table = 'warehouse_stock';
-      // asumimos columnas product_id, warehouse_id, stock
-      $warehouse_col_product = 'product_id';
-      $warehouse_col_warehouse = 'warehouse_id';
-    } else {
-      $res2 = $pdo->query("SHOW TABLES LIKE 'product_stock'")->fetch(PDO::FETCH_NUM);
-      if ($res2) {
-        $table = 'product_stock';
-        $warehouse_col_product = 'product_id';
-        $warehouse_col_warehouse = 'warehouse_id';
-      }
-    }
-
-    if ($table) {
-      $sql = "
-        SELECT w.warehouse_id, w.name AS warehouse_name, COALESCE(s.stock, 0) AS stock
-        FROM warehouses w
-        LEFT JOIN {$table} s
-          ON s.{$warehouse_col_warehouse} = w.warehouse_id
-         AND s.{$warehouse_col_product} = :product_id
-        ORDER BY w.warehouse_id ASC
-      ";
-      $stock_stmt = $pdo->prepare($sql);
-      $stock_stmt->execute(['product_id' => $product_id]);
-      $warehouses_stock = $stock_stmt->fetchAll(PDO::FETCH_ASSOC);
-    } else {
-      // Si no hay tabla específica de stock, inicializamos con 0 por almacén (si hay almacenes)
-      $warehouses_stock = [];
-      foreach ($whs as $w) {
-        $warehouses_stock[] = [
-          'warehouse_id' => $w['warehouse_id'],
-          'warehouse_name' => $w['name'],
-          'stock' => 0
-        ];
-      }
-    }
-  } catch (PDOException $e) {
-    error_log("Error al obtener stock por almacén: " . $e->getMessage());
-    $warehouses_stock = [];
-  }
-
-} catch (PDOException $e) {
-  echo "Error en la base de datos: " . $e->getMessage();
-  exit();
 }
 
+$product = $data['product'];
+$whs = $data['warehouses'];
+$warehouses_stock = $data['warehouses_stock'];
+
+// -------------------------------------------------------
+// Variables auxiliares para la vista
+// -------------------------------------------------------
+
+// Se obtiene el nombre del usuario logueado
+// y se escapa para evitar XSS.
 $username = htmlspecialchars($_SESSION['user']['username']);
+
+// Variable usada para marcar el menú activo en la UI
 $activeMenu = 'list_product';
 
-
 ?>
+
+
 
 <div class="container-fluid m-0 p-0 min-vh-100" data-bs-theme="auto">
   <div class="row g-0">
@@ -756,72 +729,12 @@ include __DIR__ . '/../partials/modals/modal_stock_transfer.php';
   });
 </script>
 
-<script>
-  document.addEventListener("DOMContentLoaded", () => {
-    // Selector de imágenes que abrirán el modal: puedes usar #productImage u otras con clase 'zoomable'
-    const zoomableSelector = ".zoomable, #productImage";
-    const previewModalEl = document.getElementById("imagePreviewModal");
-    const previewImg = document.getElementById("imagePreviewModalImg");
-
-    if (!previewModalEl || !previewImg) return;
-
-    const modalInstance = new bootstrap.Modal(previewModalEl, {
-      keyboard: true,
-      backdrop: true
-    });
-
-    // Añadimos listener a todas las imágenes existentes que encajen con el selector
-    function attachZoomListeners() {
-      const imgs = document.querySelectorAll(zoomableSelector);
-      imgs.forEach(img => {
-        // evitar múltiples listeners
-        if (img.dataset.zoomAttached) return;
-        img.dataset.zoomAttached = "1";
-
-        img.addEventListener("click", (e) => {
-          const src = img.getAttribute("src") || img.dataset.src;
-          if (!src) return;
-          // usar cache-buster para forzar recarga si se actualizó la imagen
-          const cacheBusted = src + (src.includes('?') ? '&' : '?') + 'v=' + Date.now();
-          previewImg.src = cacheBusted;
-          previewImg.alt = img.alt || 'Imagen del producto';
-          modalInstance.show();
-        });
-      });
-    }
-
-    attachZoomListeners();
-
-    // Si cargas/actualizas la imagen dinámicamente y quieres re-attach (por ejemplo tras editar),
-    // llama a attachZoomListeners() de nuevo desde donde actualizas la imagen.
-  });
-</script>
+<script src="<?= BASE_URL ?>assets/js/product_image_zoom.js"></script>
 
 
-<style>
-  .sidebar .nav-link:hover {
-    transform: translateX(5px);
-  }
 
-  .card {
-    transition: transform .2s ease, box-shadow .2s ease;
-  }
+<link rel="stylesheet" href="<?= BASE_URL ?>assets/css/product_detail.css">
 
-  .card:hover {
-    transform: translateY(-2px);
-  }
-
-
-  /* Cursor pointer para miniaturas zoomables */
-  .zoomable {
-    cursor: pointer;
-    transition: transform .15s ease;
-  }
-
-  .zoomable:hover {
-    transform: scale(1.02);
-  }
-</style>
 
 
 <!-- Modal imagen grande -->
