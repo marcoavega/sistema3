@@ -65,7 +65,11 @@ $product_id = (int) $_GET['id'];
 // Permite usar header() sin errores aunque
 // luego se genere salida HTML.
 ob_start();
+<<<<<<< HEAD
+
 require_once __DIR__ . '/../../models/Database.php';
+=======
+>>>>>>> 66b8035edadf172d421b28555bfdb4af5b1d5f91
 
 //require_once __DIR__ . '/../../models/ProductDetailModel.php';
 require_once __DIR__ . '/../../models/ProductDetailModel.php';
