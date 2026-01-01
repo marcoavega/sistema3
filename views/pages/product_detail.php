@@ -15,6 +15,7 @@ if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
 $product_id = (int) $_GET['id'];
 
 ob_start();
+
 require_once __DIR__ . '/../../models/Database.php';
 
 try {
