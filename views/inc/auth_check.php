@@ -1,7 +1,7 @@
 <?php
 // views/inc/auth_check.php
-
 // --- 1. Iniciar sesión si no está iniciada ---
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }

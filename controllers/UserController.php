@@ -1,4 +1,5 @@
 <?php
+//controllers/UserController.php
 // Se requiere el modelo de usuario y la conexión a la base de datos para gestionar las operaciones de usuario.
 require_once __DIR__ . '/../models/User.php';
 require_once __DIR__ . '/../models/Database.php';
@@ -281,4 +282,9 @@ ORDER BY users.user_id ASC
             return ['success' => false, 'message' => 'No se pudo crear el usuario: ' . $errorInfo[2]];
         }
     }
+
+
+    
+
+
 }

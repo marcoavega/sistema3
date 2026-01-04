@@ -1,5 +1,5 @@
 <?php
-
+//models/User.php
 // Clase User: gestiona la autenticación de usuarios
 class User
 {
