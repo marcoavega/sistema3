@@ -33,7 +33,7 @@
     <!-- Estilos específicos para la barra de navegación -->
 
     <script>
-        var BASE_URL = "<?php echo BASE_URL; ?>"; 
+        window.BASE_URL = "<?= BASE_URL ?>";
         // Define la variable BASE_URL en JavaScript para que pueda ser usada en scripts dinámicos en el frontend
     </script>
 </head>
