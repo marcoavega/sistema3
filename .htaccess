@@ -11,6 +11,8 @@ RewriteCond %{REQUEST_FILENAME} !-f
 # Condición 2: Si el directorio solicitado NO existe en el servidor, entonces aplicar la regla de reescritura
 RewriteCond %{REQUEST_FILENAME} !-d
 
+RewriteCond %{REQUEST_URI} !^/assets/
+
 # Regla de reescritura:
 # - Captura cualquier URL solicitada (^.*$)
 # - Redirige la solicitud hacia index.php pasando la URL original como un parámetro GET (index.php?url=$1)

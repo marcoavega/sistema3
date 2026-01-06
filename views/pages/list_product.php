@@ -96,7 +96,7 @@ $username = htmlspecialchars($_SESSION['user']['username']);
                 <div class="container-fluid px-4 py-3">
                     <div class="d-flex justify-content-between align-items-center">
 
-                        <!-- ===== MIGAS DE PAN Y TÍTULO ===== -->
+                        <!-- =====TÍTULO ===== -->
                         <div>
                             <nav aria-label="breadcrumb">
                                 <ol class="breadcrumb mb-2 small">
@@ -458,6 +458,7 @@ $username = htmlspecialchars($_SESSION['user']['username']);
                 <?php
                 include __DIR__ . '/../partials/modals/modal_add_product.php';
                 include __DIR__ . '/../partials/modals/modal_edit_product.php';
+                include __DIR__ . '/../partials/modals/products/imagePreviewModal.php';
                 ?>
 
             <?php endif; ?>
@@ -465,28 +466,6 @@ $username = htmlspecialchars($_SESSION['user']['username']);
     </div>
 </div>
 
-<!-- =====================================================
-     MODAL PARA VISTA PREVIA DE IMÁGENES
-===================================================== -->
-<div class="modal fade" id="imagePreviewModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-xl">
-        <div class="modal-content border-0 bg-transparent">
-            <div class="modal-body p-0 text-center">
-
-                <!-- BOTÓN CERRAR -->
-                <button type="button"
-                        class="btn-close btn-close-white position-absolute top-0 end-0 m-3"
-                        data-bs-dismiss="modal"></button>
-
-                <!-- IMAGEN -->
-                <img id="imagePreviewModalImg"
-                     src=""
-                     alt="Vista previa"
-                     class="img-fluid rounded shadow-lg">
-            </div>
-        </div>
-    </div>
-</div>
 
 <?php
 /*
@@ -504,29 +483,7 @@ include __DIR__ . '/../partials/layouts/navbar.php';
 ===================================================== -->
 <script src="<?php echo BASE_URL; ?>assets/js/ajax/products-table.js"></script>
 
-<script>
-/*
- |----------------------------------------------------------
- | Carga inicial de estadísticas
- |----------------------------------------------------------
- | Cuando la página termina de cargar:
- | 1. Se hace una petición fetch a la API
- | 2. Se reciben estadísticas en formato JSON
- | 3. Se insertan los valores en las tarjetas
- */
-document.addEventListener('DOMContentLoaded', function() {
-
-    fetch("<?php echo BASE_URL; ?>api/products.php?action=stats")
-        .then(res => res.json())
-        .then(data => {
-            if (data.success) {
-                document.getElementById('totalProducts').textContent = data.total || 0;
-                document.getElementById('inStock').textContent = data.inStock || 0;
-                document.getElementById('lowStock').textContent = data.lowStock || 0;
-                document.getElementById('totalValue').textContent = `$${data.totalValue || '0.00'}`;
-            }
-        })
-        .catch(err => console.error("Error al cargar estadísticas:", err));
-
-});
-</script>
+<!-- =====================================================
+     ARCHIVO JS PARA ESTADÍSTICAS DE INVENTARIO
+===================================================== --> 
+<script src="<?php echo BASE_URL; ?>assets/js/ajax/inventory.js"></script>
