@@ -25,21 +25,21 @@ require_once __DIR__ . '/../../controllers/ExchangeRatesController.php';
    2. GESTIÓN DE PERMISOS SEGÚN EL NIVEL DE USUARIO
    ========================================================================== */
 
-// Se obtiene el nivel del usuario desde la sesión.
-// Si no existe, por defecto se asigna nivel 3 (solo consulta).
-// Nivel 1 = Administrador
-// Nivel 2 = Editor
-// Nivel 3 = Consulta
-$userLevel = $_SESSION['user']['level_user'] ?? 3;
+// Permisos por nivel de usuario
+// Nivel 1 = Administrador (full)
+// Nivel 2 = Editor (crear/editar, no eliminar)
+// Niveles 3,4,5 = Solo consulta (sin crear/editar/eliminar)
 
-// Permiso para agregar monedas y tasas:
-// - Admin (1)
-// - Editor (2)
-$canAdd = ($userLevel == 1 || $userLevel == 2);
+$userLevel = (int) ($_SESSION['user']['level_user'] ?? 3);
 
-// Permiso para eliminar registros:
-// - Solo el Administrador (1)
-$canDel = ($userLevel == 1);
+// Permisos de acción en la UI
+$canView   = true; // todos pueden ver
+$canAdd    = ($userLevel === 1 || $userLevel === 2);        // crear moneda / tasa
+$canEdit   = ($userLevel === 1 || $userLevel === 2);        // editar valores (si existe edición)
+$canDel    = ($userLevel === 1);                            // eliminar solo admin
+
+// Si quieres controlar exportar: permitimos a todos; cambia si deseas limitar
+$canExport = true;
 
 /* ==========================================================================
    3. OBTENCIÓN DE DATOS DESDE EL CONTROLADOR
@@ -315,10 +315,10 @@ ob_start();
    ========================================================================== */
 
 // Modal para agregar una nueva moneda
-include __DIR__ . '/../partials/modals/add_currency_modal.php';
+include __DIR__ . '/../partials/modals/exchange_rates/modal_add_currency.php';
 
 // Modal para agregar una nueva tasa de cambio
-include __DIR__ . '/../partials/modals/add_rate_modal.php';
+include __DIR__ . '/../partials/modals/exchange_rates/modal_add_rate.php';
 
 /* ==========================================================================
    6. FINALIZACIÓN DEL BUFFER Y CARGA DEL LAYOUT PRINCIPAL
