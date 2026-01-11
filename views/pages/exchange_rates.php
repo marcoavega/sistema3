@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Archivo: views/pages/exchange_rates.php
  * --------------------------------------------------------------------------
@@ -74,12 +75,12 @@ ob_start();
 
 <div class="container-fluid m-0 p-0 min-vh-100 bg-body-tertiary" data-bs-theme="auto">
     <div class="row g-0">
-        
+
         <!-- Menú lateral del dashboard -->
         <?php require_once __DIR__ . '/../partials/layouts/laterals_menus/lateral_menu_dashboard.php'; ?>
 
         <main class="col-12 col-md-10">
-            
+
             <!-- Encabezado superior con breadcrumb y título -->
             <div class="bg-body shadow-sm border-bottom">
                 <div class="container-fluid px-4 py-3 d-flex justify-content-between align-items-center">
@@ -89,7 +90,7 @@ ob_start();
                             <ol class="breadcrumb mb-2 small">
                                 <li class="breadcrumb-item">
                                     <a href="<?= BASE_URL ?>dashboard" class="text-decoration-none">
-                                        Dashboard
+                                        Dashboard <?= $_SESSION['user']['level_user'] ?>
                                     </a>
                                 </li>
                                 <li class="breadcrumb-item active text-body">
@@ -108,9 +109,9 @@ ob_start();
                     <!-- Botón para mostrar menú lateral en móviles -->
                     <div class="d-md-none">
                         <button class="btn btn-outline-primary shadow-sm"
-                                type="button"
-                                data-bs-toggle="offcanvas"
-                                data-bs-target="#mobileMenu">
+                            type="button"
+                            data-bs-toggle="offcanvas"
+                            data-bs-target="#mobileMenu">
                             <i class="bi bi-list fs-5"></i>
                         </button>
                     </div>
@@ -119,7 +120,7 @@ ob_start();
 
             <!-- Contenido principal -->
             <div class="container-fluid px-4 py-4">
-                
+
                 <!-- Mensaje flash de éxito -->
                 <?php if (!empty($_SESSION['flash_success'])): ?>
                     <div class="alert alert-success border-0 shadow-sm rounded-3 mb-4">
@@ -130,7 +131,7 @@ ob_start();
                 <?php endif; ?>
 
                 <div class="row g-4">
-                    
+
                     <!-- =======================
                          COLUMNA DE MONEDAS
                          ======================= -->
@@ -142,8 +143,8 @@ ob_start();
                                 <!-- Botón para agregar moneda (solo si tiene permiso) -->
                                 <?php if ($canAdd): ?>
                                     <button class="btn btn-sm btn-primary rounded-pill px-3 shadow-sm"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#modalAddCurrency">
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#modalAddCurrency">
                                         <i class="fas fa-plus me-1"></i> Nueva
                                     </button>
                                 <?php endif; ?>
@@ -192,7 +193,7 @@ ob_start();
                                     <!-- Exportación de datos -->
                                     <div class="dropdown">
                                         <button class="btn btn-outline-secondary btn-sm rounded-pill px-3 shadow-sm dropdown-toggle"
-                                                data-bs-toggle="dropdown">
+                                            data-bs-toggle="dropdown">
                                             <i class="fas fa-file-export me-1"></i> Exportar
                                         </button>
                                         <ul class="dropdown-menu dropdown-menu-end shadow border-0">
@@ -212,8 +213,8 @@ ob_start();
                                     <!-- Botón para agregar nueva tasa -->
                                     <?php if ($canAdd): ?>
                                         <button class="btn btn-sm btn-primary rounded-pill px-3 shadow-sm"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#modalAddRate">
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#modalAddRate">
                                             <i class="fas fa-plus me-1"></i> Nuevo Valor
                                         </button>
                                     <?php endif; ?>
@@ -226,16 +227,16 @@ ob_start();
                                     <div class="col-md-4">
                                         <label class="small text-muted mb-1">Desde:</label>
                                         <input type="date" id="filter-date-start"
-                                               class="form-control form-control-sm border-0 shadow-sm">
+                                            class="form-control form-control-sm border-0 shadow-sm">
                                     </div>
                                     <div class="col-md-4">
                                         <label class="small text-muted mb-1">Hasta:</label>
                                         <input type="date" id="filter-date-end"
-                                               class="form-control form-control-sm border-0 shadow-sm">
+                                            class="form-control form-control-sm border-0 shadow-sm">
                                     </div>
                                     <div class="col-md-4">
                                         <button id="btn-clear-filter"
-                                                class="btn btn-sm btn-outline-secondary w-100 shadow-sm border-0 bg-body">
+                                            class="btn btn-sm btn-outline-secondary w-100 shadow-sm border-0 bg-body">
                                             <i class="bi bi-x-circle me-1"></i> Limpiar
                                         </button>
                                     </div>
@@ -281,17 +282,19 @@ ob_start();
                                                     <!-- Acciones disponibles -->
                                                     <td class="text-end pe-4">
                                                         <div class="btn-group">
-                                                            <button class="btn btn-sm btn-light border shadow-sm">
-                                                                <i class="bi bi-pencil"></i>
-                                                            </button>
+                                                            <?php if ($canEdit): ?>
+                                                                <button class="btn btn-sm btn-light border shadow-sm" data-rate-id="<?= intval($rate['id'] ?? 0) ?>" title="Editar">
+                                                                    <i class="bi bi-pencil"></i>
+                                                                </button>
+                                                            <?php endif; ?>
 
-                                                            <!-- Eliminar solo para admin -->
                                                             <?php if ($canDel): ?>
-                                                                <button class="btn btn-sm btn-light border text-danger shadow-sm">
+                                                                <button class="btn btn-sm btn-light border text-danger shadow-sm" data-rate-id="<?= intval($rate['id'] ?? 0) ?>" title="Eliminar">
                                                                     <i class="bi bi-trash"></i>
                                                                 </button>
                                                             <?php endif; ?>
                                                         </div>
+
                                                     </td>
                                                 </tr>
                                             <?php endforeach; ?>
@@ -330,6 +333,17 @@ $content = ob_get_clean();
 // Se carga el layout principal que renderiza la vista
 include __DIR__ . '/../partials/layouts/navbar.php';
 ?>
+
+<script>
+    window.PERMISSIONS = {
+        canEdit: <?= $canEdit ? 'true' : 'false' ?>,
+        canDelete: <?= $canDel ? 'true' : 'false' ?>
+    };
+</script>
+
+
+
+
 
 <!-- Script JavaScript para manejo AJAX de tasas de cambio -->
 <script src="<?= BASE_URL ?>assets/js/ajax/exchange_rates.js"></script>
