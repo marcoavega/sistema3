@@ -39,8 +39,12 @@ require_once __DIR__ . '/../inc/auth_check.php';
  */
 $isAdmin = (
     isset($_SESSION['user']['level_user']) &&
-    $_SESSION['user']['level_user'] == 1
+    (
+        $_SESSION['user']['level_user'] == 1 ||
+        $_SESSION['user']['level_user'] == 2
+    )
 );
+
 
 /**
  * Se obtiene el nombre de usuario desde la sesión.

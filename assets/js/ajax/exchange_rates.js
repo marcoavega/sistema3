@@ -3,6 +3,50 @@ document.addEventListener('DOMContentLoaded', function () {
     const ratesTbody = document.querySelector('#rates-tbody');
     const currenciesListEl = document.querySelector('#currencies-list');
 
+    // --- DETECCIÓN DE NIVEL DE USUARIO (FALLBACKS) ---
+    function detectUserLevel() {
+        // 1) data-user-level en body (lo más limpio si lo tienes)
+        const bodyLevel = document.body?.dataset?.userLevel;
+        if (bodyLevel) {
+            const n = parseInt(bodyLevel, 10);
+            if (!isNaN(n)) return n;
+        }
+
+        // 2) variable JS global (por si la inyectaste)
+        if (typeof window.USER_LEVEL !== 'undefined') {
+            const n = parseInt(window.USER_LEVEL, 10);
+            if (!isNaN(n)) return n;
+        }
+        if (typeof window.userLevel !== 'undefined') {
+            const n = parseInt(window.userLevel, 10);
+            if (!isNaN(n)) return n;
+        }
+
+        // 3) intentar leer el breadcrumb donde a veces imprimiste el nivel (ej: "Dashboard 4")
+        try {
+            const links = document.querySelectorAll('.breadcrumb a, .breadcrumb .breadcrumb-item');
+            for (const el of links) {
+                const txt = (el.textContent || '').trim();
+                const m = txt.match(/\b(\d)\b/); // buscar dígito aislado
+                if (m) {
+                    const n = parseInt(m[1], 10);
+                    if (!isNaN(n)) return n;
+                }
+            }
+        } catch (e) {
+            // noop
+        }
+
+        // 4) fallback por defecto: nivel 3 (solo consulta)
+        return 3;
+    }
+
+    const USER_LEVEL = detectUserLevel();
+
+    // Permisos según tu regla: 1 = admin (todo), 2 = editor (no borrar), 3/4/5 = solo ver
+    const canEditGlobal = (USER_LEVEL === 1 || USER_LEVEL === 2);
+    const canDeleteGlobal = (USER_LEVEL === 1);
+
     // --- VARIABLES DE ESTADO ---
     let allRates = [];
     let currentPage = 1;
@@ -11,6 +55,63 @@ document.addEventListener('DOMContentLoaded', function () {
     // Filtros activos
     let currentStart = '';
     let currentEnd = '';
+
+    // ==========================================
+    // FUNCIONES AUX: aplicar permisos (ocultar botones)
+    // ==========================================
+    function applyPermissionsToDom() {
+        // monedas
+        if (!canEditGlobal) {
+            document.querySelectorAll('.btn-edit-currency').forEach(b => {
+                b.style.display = 'none';
+            });
+        } else {
+            document.querySelectorAll('.btn-edit-currency').forEach(b => {
+                b.style.display = '';
+            });
+        }
+
+        if (!canDeleteGlobal) {
+            document.querySelectorAll('.btn-delete-currency').forEach(b => {
+                b.style.display = 'none';
+            });
+        } else {
+            document.querySelectorAll('.btn-delete-currency').forEach(b => {
+                b.style.display = '';
+            });
+        }
+
+        // tasas
+        if (!canEditGlobal) {
+            document.querySelectorAll('.btn-edit-rate').forEach(b => {
+                b.style.display = 'none';
+            });
+        } else {
+            document.querySelectorAll('.btn-edit-rate').forEach(b => {
+                b.style.display = '';
+            });
+        }
+
+        if (!canDeleteGlobal) {
+            document.querySelectorAll('.btn-delete-rate').forEach(b => {
+                b.style.display = 'none';
+            });
+        } else {
+            document.querySelectorAll('.btn-delete-rate').forEach(b => {
+                b.style.display = '';
+            });
+        }
+
+        // Botones globales del UI (ej. crear nuevo) — si existen en la vista:
+        const newCurrencyBtn = document.querySelector('[data-bs-target="#modalAddCurrency"]');
+        if (newCurrencyBtn) {
+            newCurrencyBtn.style.display = canEditGlobal ? '' : 'none';
+        }
+        const newRateBtn = document.querySelector('[data-bs-target="#modalAddRate"]');
+        if (newRateBtn) {
+            newRateBtn.style.display = canEditGlobal ? '' : 'none';
+        }
+    }
 
     // ==========================================
     // 1. RENDERIZADO
@@ -53,6 +154,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
         document.querySelectorAll('.btn-delete-currency').forEach(btn => btn.onclick = onDeleteCurrencyClick);
         document.querySelectorAll('.btn-edit-currency').forEach(btn => btn.onclick = onEditCurrencyClick);
+
+        // aplicar permisos después de renderizar
+        applyPermissionsToDom();
     };
 
     const renderRates = (items) => {
@@ -62,6 +166,8 @@ document.addEventListener('DOMContentLoaded', function () {
         if (items.length === 0) {
             ratesTbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-muted">No se encontraron registros</td></tr>';
             renderPaginationControls(0);
+            // aplicar permisos aunque no haya filas (por si botones globales deben ocultarse)
+            applyPermissionsToDom();
             return;
         }
 
@@ -93,6 +199,9 @@ document.addEventListener('DOMContentLoaded', function () {
         document.querySelectorAll('.btn-edit-rate').forEach(btn => btn.onclick = onEditRateClick);
         
         renderPaginationControls(items.length);
+
+        // aplicar permisos después de renderizar
+        applyPermissionsToDom();
     };
 
     const renderPaginationControls = (totalRecords) => {

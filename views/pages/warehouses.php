@@ -2,6 +2,13 @@
 // Archivo: views/pages/warehouses.php
 require_once __DIR__ . '/../inc/auth_check.php';
 
+$levelUser = $_SESSION['user']['level_user'] ?? 0;
+
+$canCreate = in_array($levelUser, [1, 2, 3]);
+$canEdit   = in_array($levelUser, [1, 2]);
+$canDelete = in_array($levelUser, [1, 2]);
+
+
 $uri = $_GET['url'] ?? 'warehouses';
 $segment = explode('/', trim($uri, '/'))[0];
 
@@ -21,16 +28,19 @@ $username = htmlspecialchars($_SESSION['user']['username']);
         border: none;
         transition: all 0.2s ease;
     }
+
     .btn-soft-primary:hover {
         background-color: #0d6efd;
         color: white;
     }
+
     .btn-soft-danger {
         background-color: rgba(220, 53, 69, 0.1);
         color: #dc3545;
         border: none;
         transition: all 0.2s ease;
     }
+
     .btn-soft-danger:hover {
         background-color: #dc3545;
         color: white;
@@ -38,10 +48,17 @@ $username = htmlspecialchars($_SESSION['user']['username']);
 
     /* Ajuste responsivo Botón Nuevo Almacén */
     @media (max-width: 767px) {
-        .btn-responsive-add { width: 100%; }
+        .btn-responsive-add {
+            width: 100%;
+        }
     }
+
     @media (min-width: 768px) {
-        .btn-responsive-add { width: auto; padding-left: 1.5rem; padding-right: 1.5rem; }
+        .btn-responsive-add {
+            width: auto;
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
+        }
     }
 </style>
 
@@ -74,9 +91,11 @@ $username = htmlspecialchars($_SESSION['user']['username']);
                         </div>
 
                         <div class="col-12 col-md-6 text-md-end">
-                            <button id="addWarehouseBtn" class="btn btn-primary rounded-pill shadow-sm btn-responsive-add">
-                                <i class="fas fa-plus-circle me-2"></i>Nuevo Almacén
-                            </button>
+                            <?php if ($canCreate): ?>
+                                <button id="addWarehouseBtn" class="btn btn-primary rounded-pill shadow-sm btn-responsive-add">
+                                    <i class="fas fa-plus-circle me-2"></i>Nuevo Almacén
+                                </button>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
@@ -100,7 +119,7 @@ $username = htmlspecialchars($_SESSION['user']['username']);
                                     </tr>
                                 </thead>
                                 <tbody id="warehouses-tbody" class="border-top-0">
-                                    </tbody>
+                                </tbody>
                             </table>
                         </div>
                     </div>
@@ -114,49 +133,49 @@ $username = htmlspecialchars($_SESSION['user']['username']);
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
                 </div>
-                
+
                 <div class="offcanvas-body p-0 d-flex flex-column h-100">
                     <div class="list-group list-group-flush mt-2">
-                        <?php 
+                        <?php
                         $menuToRender = $menuItems ?? [];
-                        if (!empty($menuToRender)): 
-                            foreach ($menuToRender as $route => $item): 
+                        if (!empty($menuToRender)):
+                            foreach ($menuToRender as $route => $item):
                                 $isActiveParent = ($segment === $route);
                                 $isSubActive = isset($item['submenu']) && array_key_exists($segment, $item['submenu']);
                                 $itemIcon = htmlspecialchars($item['icon'] ?? 'circle');
                                 $itemLabel = htmlspecialchars($item['label'] ?? $route);
                         ?>
-                                <a href="<?= BASE_URL . $route ?>" 
-                                   class="list-group-item list-group-item-action border-0 py-3 px-4 d-flex align-items-center <?= ($isActiveParent || $isSubActive) ? 'bg-primary-subtle text-primary border-start border-4 border-primary fw-bold' : 'text-body' ?>">
-                                    <i class="bi bi-<?= $itemIcon ?> me-3 fs-5"></i> 
+                                <a href="<?= BASE_URL . $route ?>"
+                                    class="list-group-item list-group-item-action border-0 py-3 px-4 d-flex align-items-center <?= ($isActiveParent || $isSubActive) ? 'bg-primary-subtle text-primary border-start border-4 border-primary fw-bold' : 'text-body' ?>">
+                                    <i class="bi bi-<?= $itemIcon ?> me-3 fs-5"></i>
                                     <?= $itemLabel ?>
                                 </a>
 
                                 <?php if (isset($item['submenu'])): ?>
                                     <div class="bg-body-tertiary shadow-inner">
-                                        <?php foreach ($item['submenu'] as $subRoute => $subItem): 
+                                        <?php foreach ($item['submenu'] as $subRoute => $subItem):
                                             $isSubItemActive = ($segment === $subRoute);
                                             $subIcon = htmlspecialchars($subItem['icon'] ?? 'circle');
                                             $subLabel = htmlspecialchars($subItem['label'] ?? $subRoute);
                                         ?>
-                                            <a href="<?= BASE_URL . $subRoute ?>" 
-                                               class="list-group-item list-group-item-action border-0 py-2 ps-5 d-flex align-items-center <?= $isSubItemActive ? 'text-primary fw-bold' : 'text-muted' ?>" style="font-size: 0.85rem;">
-                                                <i class="bi bi-<?= $subIcon ?> me-3 fs-6"></i> 
+                                            <a href="<?= BASE_URL . $subRoute ?>"
+                                                class="list-group-item list-group-item-action border-0 py-2 ps-5 d-flex align-items-center <?= $isSubItemActive ? 'text-primary fw-bold' : 'text-muted' ?>" style="font-size: 0.85rem;">
+                                                <i class="bi bi-<?= $subIcon ?> me-3 fs-6"></i>
                                                 <?= $subLabel ?>
                                             </a>
                                         <?php endforeach; ?>
                                     </div>
                                 <?php endif; ?>
-                        <?php 
-                            endforeach; 
-                        else: 
-                        ?>
+                            <?php
+                            endforeach;
+                        else:
+                            ?>
                             <div class="p-4 text-center text-muted">
                                 <small>No se pudo cargar el menú dinámico.</small>
                             </div>
                         <?php endif; ?>
                     </div>
-                    
+
                     <div class="mt-auto border-top p-4 text-center">
                         <small class="text-muted d-block mb-1">Usuario conectado:</small>
                         <span class="badge border px-3 py-2 rounded-pill shadow-sm text-body">
@@ -179,3 +198,8 @@ include __DIR__ . '/../partials/layouts/navbar.php';
 ?>
 
 <script src="<?= BASE_URL; ?>assets/js/ajax/warehouses.js"></script>
+
+<script>
+    const CAN_EDIT = <?= $canEdit ? 'true' : 'false' ?>;
+    const CAN_DELETE = <?= $canDelete ? 'true' : 'false' ?>;
+</script>
