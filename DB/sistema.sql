@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 09-01-2026 a las 04:55:51
+-- Tiempo de generación: 14-01-2026 a las 20:49:16
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -91,7 +91,7 @@ INSERT INTO `currencies` (`currency_id`, `currency_code`, `currency_name`, `coun
 (2, 'USD', 'Dólar Estadounidense', 'Estados Unidos', '2025-11-20 18:42:14'),
 (6, 'EURO', 'Euro', 'Europa', '2025-11-21 04:50:43'),
 (45, 'YEN', 'YEN', 'JAPON', '2025-12-22 14:54:07'),
-(46, 'EURO2', 'Euro2', 'Europa2', '2025-12-24 18:45:44');
+(48, 'EURO2', 'Euro2', 'Europa2', '2026-01-11 18:44:40');
 
 -- --------------------------------------------------------
 
@@ -122,9 +122,8 @@ INSERT INTO `exchange_rates` (`rate_id`, `currency_id`, `rate`, `rate_date`, `no
 (44, 2, 18.500000, '2025-12-22', '', '2025-12-22 13:41:20'),
 (45, 1, 19.000000, '2025-12-22', '', '2025-12-22 13:41:29'),
 (46, 2, 18.640000, '2025-12-22', '', '2025-12-22 13:41:41'),
-(48, 45, 10.000000, '2025-12-22', '10', '2025-12-22 15:17:10'),
-(49, 45, 10.000000, '2025-12-22', '11', '2025-12-22 15:17:50'),
-(50, 46, 23.000000, '2025-12-24', '20', '2025-12-24 18:45:55');
+(49, 45, 12.000000, '2025-12-22', '12', '2025-12-22 15:17:50'),
+(53, 48, 22.000000, '2026-01-11', '22', '2026-01-11 18:44:52');
 
 -- --------------------------------------------------------
 
@@ -11252,7 +11251,7 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`user_id`, `username`, `email`, `password`, `level_user`, `created_at`, `updated_at`, `img_url`) VALUES
 (2, 'administrador2', 'administrador2@gmail.com', '$2y$10$GgtTWrlYykHcv6hednsnKOEJEKyOG5JQmrMnHjX736nL4p6gK2bAW', 1, '2025-03-18 20:15:59', '2025-07-16 19:40:05', ''),
-(15, 'administrador1', 'administrador1@gmail.com', '$2y$10$HqeAjVjU2IdwaCGQfV3T.OvgOXuWF.IpPJPKT57FqDO3FtBby5dom', 1, '2025-03-28 23:33:42', '2025-05-22 17:49:07', ''),
+(15, 'administrador1', 'administrador1@gmail.com', '$2y$10$HqeAjVjU2IdwaCGQfV3T.OvgOXuWF.IpPJPKT57FqDO3FtBby5dom', 4, '2025-03-28 23:33:42', '2026-01-10 17:50:27', ''),
 (27, 'administrador', 'administrador@gmail.com', '$2y$10$j.n/yl2twdiwX7qdoYV1t.tT2dYVMYmKB3NCodQ9nyasBqHlOA45C', 1, '2025-04-18 05:44:07', '2025-07-10 17:11:40', 'assets/images/users/administrador.jpg'),
 (34, 'administrador3', 'administrador3@gmail.com', '$2y$10$oX3TFhuG8TISWvSvnYZ35eMBtZxhP5HnIviTvUaa9bC9QTxpRvQSe', 1, '2025-05-05 23:16:29', '2025-05-05 23:16:48', ''),
 (46, 'administrador4', 'administrador4@gmail.com', '$2y$10$j25.pyBSiZUGXT5J0H5kRO1Gyw3tLqjx/HEBLdnpfra09SnEz9Xuq', 1, '2025-05-23 01:42:43', '2025-07-18 00:55:49', ''),
@@ -11500,7 +11499,60 @@ INSERT INTO `user_logs` (`id`, `user_id`, `action`, `timestamp`) VALUES
 (521, 27, 'login', '2026-01-04 12:39:19'),
 (522, 27, 'login', '2026-01-05 10:16:09'),
 (523, 27, 'login', '2026-01-08 13:19:32'),
-(524, 27, 'Actualizó registro de tasa ID: 50', '2026-01-08 13:51:33');
+(524, 27, 'Actualizó registro de tasa ID: 50', '2026-01-08 13:51:33'),
+(525, 27, 'login', '2026-01-09 17:04:59'),
+(526, 27, 'Eliminó tasa ID: 50', '2026-01-09 17:33:45'),
+(527, 27, 'Eliminó moneda ID: 46', '2026-01-09 17:33:50'),
+(528, 27, 'Creó moneda: EURO2', '2026-01-09 17:34:02'),
+(529, 27, 'Registró tasa para Moneda ID: 47', '2026-01-09 17:34:30'),
+(530, 27, 'Actualizó registro de tasa ID: 51', '2026-01-09 17:34:42'),
+(531, 27, 'login', '2026-01-10 09:20:59'),
+(532, 27, 'Actualizó datos del usuario: administrador1', '2026-01-10 11:47:51'),
+(533, 27, 'logout', '2026-01-10 11:47:57'),
+(534, 15, 'login', '2026-01-10 11:48:07'),
+(535, 15, 'Actualizó registro de tasa ID: 51', '2026-01-10 11:49:03'),
+(536, 15, 'logout', '2026-01-10 11:49:59'),
+(537, 27, 'login', '2026-01-10 11:50:06'),
+(538, 27, 'Actualizó datos del usuario: administrador1', '2026-01-10 11:50:27'),
+(539, 27, 'logout', '2026-01-10 11:50:47'),
+(540, 15, 'login', '2026-01-10 11:50:54'),
+(541, 15, 'Actualizó moneda ID: 45', '2026-01-10 12:22:19'),
+(542, 15, 'login', '2026-01-11 10:33:10'),
+(543, 15, 'logout', '2026-01-11 11:12:29'),
+(544, 27, 'login', '2026-01-11 11:12:35'),
+(545, 27, 'Actualizó registro de tasa ID: 51', '2026-01-11 11:12:49'),
+(546, 27, 'Actualizó registro de tasa ID: 51', '2026-01-11 11:12:52'),
+(547, 27, 'Actualizó moneda ID: 6', '2026-01-11 11:12:55'),
+(548, 27, 'Actualizó moneda ID: 45', '2026-01-11 11:13:00'),
+(549, 27, 'Actualizó moneda ID: 45', '2026-01-11 11:17:30'),
+(550, 27, 'Eliminó tasa ID: 48', '2026-01-11 11:17:41'),
+(551, 27, 'Actualizó registro de tasa ID: 49', '2026-01-11 11:17:51'),
+(552, 27, 'Actualizó registro de tasa ID: 51', '2026-01-11 12:43:01'),
+(553, 27, 'Registró tasa para Moneda ID: 47', '2026-01-11 12:43:35'),
+(554, 27, 'Eliminó tasa ID: 51', '2026-01-11 12:43:39'),
+(555, 27, 'Eliminó tasa ID: 52', '2026-01-11 12:43:42'),
+(556, 27, 'Actualizó moneda ID: 47', '2026-01-11 12:44:21'),
+(557, 27, 'Eliminó moneda ID: 47', '2026-01-11 12:44:27'),
+(558, 27, 'Creó moneda: EURO2', '2026-01-11 12:44:40'),
+(559, 27, 'Registró tasa para Moneda ID: 48', '2026-01-11 12:44:52'),
+(560, 27, 'logout', '2026-01-11 12:45:23'),
+(561, 15, 'login', '2026-01-11 12:45:31'),
+(562, 15, 'login', '2026-01-12 11:51:55'),
+(563, 15, 'logout', '2026-01-12 12:55:53'),
+(564, 27, 'login', '2026-01-12 12:56:01'),
+(565, 27, 'Creó almacén Número 34: Dostri', '2026-01-12 12:56:27'),
+(566, 27, 'Actualizó almacén id 34: \'Dostri\' → \'Distri\'', '2026-01-12 12:56:41'),
+(567, 27, 'Eliminó almacén id 34: \'Distri\'', '2026-01-12 12:56:47'),
+(568, 27, 'logout', '2026-01-12 13:45:19'),
+(569, 15, 'login', '2026-01-12 13:45:26'),
+(570, 15, 'login', '2026-01-13 10:20:26'),
+(571, 15, 'logout', '2026-01-13 12:07:34'),
+(572, 27, 'login', '2026-01-13 12:07:45'),
+(573, 27, 'logout', '2026-01-13 12:33:44'),
+(574, 15, 'login', '2026-01-13 12:33:56'),
+(575, 15, 'logout', '2026-01-13 12:45:41'),
+(576, 27, 'login', '2026-01-13 12:45:51'),
+(577, 27, 'login', '2026-01-14 12:04:28');
 
 -- --------------------------------------------------------
 
@@ -11704,13 +11756,13 @@ ALTER TABLE `companys`
 -- AUTO_INCREMENT de la tabla `currencies`
 --
 ALTER TABLE `currencies`
-  MODIFY `currency_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
+  MODIFY `currency_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
 
 --
 -- AUTO_INCREMENT de la tabla `exchange_rates`
 --
 ALTER TABLE `exchange_rates`
-  MODIFY `rate_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
+  MODIFY `rate_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=54;
 
 --
 -- AUTO_INCREMENT de la tabla `levels_users`
@@ -11752,13 +11804,13 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT de la tabla `user_logs`
 --
 ALTER TABLE `user_logs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=525;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=578;
 
 --
 -- AUTO_INCREMENT de la tabla `warehouses`
 --
 ALTER TABLE `warehouses`
-  MODIFY `warehouse_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
+  MODIFY `warehouse_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
 
 --
 -- Restricciones para tablas volcadas

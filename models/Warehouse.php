@@ -1,5 +1,5 @@
 <?php
-
+//models/Warehouse.php
 class Warehouse
 {
     private PDO $db;

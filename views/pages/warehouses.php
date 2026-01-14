@@ -103,10 +103,62 @@ $username = htmlspecialchars($_SESSION['user']['username']);
 
             <div class="container-fluid px-4 py-4">
                 <div class="card shadow-sm border-0 rounded-4 bg-body">
+
+                
+
                     <div class="card-header p-4 bg-transparent border-bottom-0">
                         <h5 class="mb-1 fw-bold text-primary">Listado de Ubicaciones</h5>
                         <p class="mb-0 text-muted small">Administra tus puntos de almacenamiento y stock físico</p>
                     </div>
+
+<!-- ===== BÚSQUEDA Y EXPORTACIÓN ===== -->
+<div class="row g-3 mb-4">
+
+<!-- BUSCADOR -->
+<div class="col-md-6">
+    <div class="position-relative">
+        <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+        <input type="text"
+               id="table-search"
+               class="form-control ps-5 rounded-pill border-2"
+               placeholder="Buscar Almacene...">
+    </div>
+</div>
+
+<!-- EXPORTACIÓN -->
+<div class="col-md-6 text-md-end">
+    <div class="dropdown d-inline-block">
+        <button class="btn btn-outline-secondary dropdown-toggle rounded-pill px-4"
+                type="button"
+                data-bs-toggle="dropdown">
+            <i class="bi bi-download me-2"></i>
+            Exportar
+        </button>
+
+        <!-- OPCIONES DE EXPORTACIÓN -->
+        <ul class="dropdown-menu shadow-lg border-0">
+            <li>
+                <button id="exportCSVBtn" class="dropdown-item">
+                    <i class="bi bi-filetype-csv me-2 text-success"></i>
+                    CSV
+                </button>
+            </li>
+            <li>
+                <button id="exportExcelBtn" class="dropdown-item">
+                    <i class="bi bi-file-earmark-excel me-2 text-success"></i>
+                    Excel
+                </button>
+            </li>
+            <li>
+                <button id="exportPDFBtn" class="dropdown-item">
+                    <i class="bi bi-file-earmark-pdf me-2 text-danger"></i>
+                    PDF
+                </button>
+            </li>
+        </ul>
+    </div>
+</div>
+</div>
 
                     <div class="card-body p-4 pt-0">
                         <div class="table-responsive border rounded-3">
