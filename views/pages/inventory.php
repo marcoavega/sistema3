@@ -1,6 +1,6 @@
 <?php
 /*******************************************************
- * Archivo: views/pages/list_product.php
+ * Archivo: views/pages/inventory.php
  * 
  * Este archivo es una vista (view) que muestra
  * la pantalla de gestión del inventario de productos.
