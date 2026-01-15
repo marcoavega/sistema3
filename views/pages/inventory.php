@@ -175,8 +175,7 @@ $username = htmlspecialchars($_SESSION['user']['username']);
                         ?>
 
                         <!-- ====== OPCIÓN DE MENÚ ====== -->
-                        <a href="<?= BASE_URL . $route ?>"
-                           class="list-group-item list-group-item-action border-0 py-3 px-4 d-flex align-items-center
+                        <a href="<?= BASE_URL . $route ?>" class="list-group-item list-group-item-action border-0 py-3 px-4 d-flex align-items-center
                            <?= ($isActiveParent || $isSubActive)
                                 ? 'bg-primary-subtle text-primary border-start border-4 border-primary fw-bold'
                                 : 'text-body' ?>">
@@ -186,30 +185,29 @@ $username = htmlspecialchars($_SESSION['user']['username']);
 
                         <!-- ====== SUBMENÚ ====== -->
                         <?php if (isset($item['submenu'])): ?>
-                            <div class="bg-body-tertiary shadow-inner">
-                                <?php foreach ($item['submenu'] as $subRoute => $subItem):
+                        <div class="bg-body-tertiary shadow-inner">
+                            <?php foreach ($item['submenu'] as $subRoute => $subItem):
                                     $isSubItemActive = ($segment === $subRoute);
                                     $subIcon = htmlspecialchars($subItem['icon'] ?? 'circle');
                                     $subLabel = htmlspecialchars($subItem['label'] ?? $subRoute);
                                 ?>
-                                    <a href="<?= BASE_URL . $subRoute ?>"
-                                       class="list-group-item list-group-item-action border-0 py-2 ps-5 d-flex align-items-center
+                            <a href="<?= BASE_URL . $subRoute ?>" class="list-group-item list-group-item-action border-0 py-2 ps-5 d-flex align-items-center
                                        <?= $isSubItemActive ? 'text-primary fw-bold' : 'text-muted' ?>"
-                                       style="font-size: 0.85rem;">
-                                        <i class="bi bi-<?= $subIcon ?> me-3 fs-6"></i>
-                                        <?= $subLabel ?>
-                                    </a>
-                                <?php endforeach; ?>
-                            </div>
+                                style="font-size: 0.85rem;">
+                                <i class="bi bi-<?= $subIcon ?> me-3 fs-6"></i>
+                                <?= $subLabel ?>
+                            </a>
+                            <?php endforeach; ?>
+                        </div>
                         <?php endif; ?>
 
                         <?php
                             endforeach;
                         else:
                         ?>
-                            <div class="p-4 text-center text-muted">
-                                <small>No se pudo cargar el menú dinámico.</small>
-                            </div>
+                        <div class="p-4 text-center text-muted">
+                            <small>No se pudo cargar el menú dinámico.</small>
+                        </div>
                         <?php endif; ?>
 
                     </div>
@@ -225,93 +223,98 @@ $username = htmlspecialchars($_SESSION['user']['username']);
                 </div>
             </div>
 
+
             <!-- =========================================
                  CONTROL DE PERMISOS
             ========================================== -->
             <?php if ($_SESSION['user']['level_user'] != 1): ?>
 
-                <!-- MENSAJE DE ACCESO DENEGADO -->
-                <div class="container-fluid px-4 py-5 text-center">
-                    <div class="card border-0 shadow-sm rounded-4 py-5 bg-body">
-                        <div class="card-body">
-                            <i class="bi bi-shield-exclamation text-warning display-1 mb-4"></i>
-                            <h3 class="fw-bold">Acceso Denegado</h3>
-                            <p class="text-muted mb-4">
-                                No tienes los permisos necesarios para acceder a esta sección.
-                            </p>
-                            <a href="<?= BASE_URL ?>dashboard" class="btn btn-primary px-4 rounded-pill">
-                                <i class="bi bi-house me-2"></i>
-                                Volver al Dashboard
-                            </a>
-                        </div>
+            <!-- MENSAJE DE ACCESO DENEGADO -->
+            <div class="container-fluid px-4 py-5 text-center">
+                <div class="card border-0 shadow-sm rounded-4 py-5 bg-body">
+                    <div class="card-body">
+                        <i class="bi bi-shield-exclamation text-warning display-1 mb-4"></i>
+                        <h3 class="fw-bold">Acceso Denegado</h3>
+                        <p class="text-muted mb-4">
+                            No tienes los permisos necesarios para acceder a esta sección.
+                        </p>
+                        <a href="<?= BASE_URL ?>dashboard" class="btn btn-primary px-4 rounded-pill">
+                            <i class="bi bi-house me-2"></i>
+                            Volver al Dashboard
+                        </a>
                     </div>
                 </div>
+            </div>
 
             <?php else: ?>
 
-                <!-- =====================================
+            <!-- =====================================
                      TARJETAS DE ESTADÍSTICAS
                 ====================================== -->
-                <div class="container-fluid px-4 py-4">
-                    <div class="row g-4 mb-4 text-body">
+            <div class="container-fluid px-4 py-4">
+                <div class="row g-4 mb-4 text-body">
 
-                        <!-- Las tarjetas muestran datos que se llenan
+                    <!-- Las tarjetas muestran datos que se llenan
                              dinámicamente con JavaScript -->
 
-                        <!-- TOTAL PRODUCTOS -->
-                        <div class="col-sm-6 col-xl-3">
-                            <div class="card border-0 shadow-sm rounded-4 bg-body h-100">
-                                <div class="card-body p-4 text-center">
-                                    <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 50px; height: 50px;">
-                                        <i class="bi bi-boxes fs-4"></i>
-                                    </div>
-                                    <h6 class="text-muted small text-uppercase fw-bold mb-1">Total Productos</h6>
-                                    <h4 class="fw-bold mb-0" id="totalProducts">-</h4>
+                    <!-- TOTAL PRODUCTOS -->
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="card border-0 shadow-sm rounded-4 bg-body h-100">
+                            <div class="card-body p-4 text-center">
+                                <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                                    style="width: 50px; height: 50px;">
+                                    <i class="bi bi-boxes fs-4"></i>
                                 </div>
+                                <h6 class="text-muted small text-uppercase fw-bold mb-1">Total Productos</h6>
+                                <h4 class="fw-bold mb-0" id="totalProducts">-</h4>
                             </div>
                         </div>
-
-                        <!-- EN STOCK -->
-                        <div class="col-sm-6 col-xl-3">
-                            <div class="card border-0 shadow-sm rounded-4 bg-body h-100">
-                                <div class="card-body p-4 text-center">
-                                    <div class="bg-success bg-opacity-10 text-success rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 50px; height: 50px;">
-                                        <i class="bi bi-check-circle fs-4"></i>
-                                    </div>
-                                    <h6 class="text-muted small text-uppercase fw-bold mb-1">En Stock</h6>
-                                    <h4 class="fw-bold mb-0" id="inStock">-</h4>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- STOCK BAJO -->
-                        <div class="col-sm-6 col-xl-3">
-                            <div class="card border-0 shadow-sm rounded-4 bg-body h-100">
-                                <div class="card-body p-4 text-center">
-                                    <div class="bg-warning bg-opacity-10 text-warning rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 50px; height: 50px;">
-                                        <i class="bi bi-exclamation-triangle fs-4"></i>
-                                    </div>
-                                    <h6 class="text-muted small text-uppercase fw-bold mb-1">Stock Bajo</h6>
-                                    <h4 class="fw-bold mb-0" id="lowStock">-</h4>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- VALOR TOTAL -->
-                        <div class="col-sm-6 col-xl-3">
-                            <div class="card border-0 shadow-sm rounded-4 bg-body h-100">
-                                <div class="card-body p-4 text-center">
-                                    <div class="bg-info bg-opacity-10 text-info rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 50px; height: 50px;">
-                                        <i class="bi bi-currency-dollar fs-4"></i>
-                                    </div>
-                                    <h6 class="text-muted small text-uppercase fw-bold mb-1">Valor Total</h6>
-                                    <h4 class="fw-bold mb-0" id="totalValue">-</h4>
-                                </div>
-                            </div>
-                        </div>
-
                     </div>
+
+                    <!-- EN STOCK -->
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="card border-0 shadow-sm rounded-4 bg-body h-100">
+                            <div class="card-body p-4 text-center">
+                                <div class="bg-success bg-opacity-10 text-success rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                                    style="width: 50px; height: 50px;">
+                                    <i class="bi bi-check-circle fs-4"></i>
+                                </div>
+                                <h6 class="text-muted small text-uppercase fw-bold mb-1">En Stock</h6>
+                                <h4 class="fw-bold mb-0" id="inStock">-</h4>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- STOCK BAJO -->
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="card border-0 shadow-sm rounded-4 bg-body h-100">
+                            <div class="card-body p-4 text-center">
+                                <div class="bg-warning bg-opacity-10 text-warning rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                                    style="width: 50px; height: 50px;">
+                                    <i class="bi bi-exclamation-triangle fs-4"></i>
+                                </div>
+                                <h6 class="text-muted small text-uppercase fw-bold mb-1">Stock Bajo</h6>
+                                <h4 class="fw-bold mb-0" id="lowStock">-</h4>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- VALOR TOTAL -->
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="card border-0 shadow-sm rounded-4 bg-body h-100">
+                            <div class="card-body p-4 text-center">
+                                <div class="bg-info bg-opacity-10 text-info rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                                    style="width: 50px; height: 50px;">
+                                    <i class="bi bi-currency-dollar fs-4"></i>
+                                </div>
+                                <h6 class="text-muted small text-uppercase fw-bold mb-1">Valor Total</h6>
+                                <h4 class="fw-bold mb-0" id="totalValue">-</h4>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
+            </div>
 
             <?php endif; ?>
 
@@ -336,6 +339,5 @@ include __DIR__ . '/../partials/layouts/navbar.php';
 
 <!-- =========================================
      ARCHIVO JS PARA ESTADÍSTICAS DE INVENTARIO
-========================================== --> 
+========================================== -->
 <script src="<?php echo BASE_URL; ?>assets/js/ajax/inventory.js"></script>
-
