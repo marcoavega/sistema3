@@ -236,81 +236,6 @@ $username = htmlspecialchars($_SESSION['user']['username']);
                 ================================================== -->
                 <div class="container-fluid px-4 py-4">
 
-                                       <!-- ===== TARJETAS DE ESTADÍSTICAS ===== -->
-                    <!-- Cada tarjeta muestra un resumen del inventario -->
-                    <!-- Los valores se cargan dinámicamente con JavaScript -->
-                    <div class="row g-4 mb-4 text-body">
-
-                        <!-- TOTAL DE PRODUCTOS -->
-                        <div class="col-sm-6 col-xl-3">
-                            <div class="card border-0 shadow-sm rounded-4 bg-body h-100">
-                                <div class="card-body p-4 text-center">
-                                    <!-- Ícono decorativo -->
-                                    <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
-                                         style="width: 50px; height: 50px;">
-                                        <i class="bi bi-boxes fs-4"></i>
-                                    </div>
-
-                                    <!-- Título -->
-                                    <h6 class="text-muted small text-uppercase fw-bold mb-1">
-                                        Total Productos
-                                    </h6>
-
-                                    <!-- Valor que se llena con JS -->
-                                    <h4 class="fw-bold mb-0" id="totalProducts">-</h4>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- PRODUCTOS EN STOCK -->
-                        <div class="col-sm-6 col-xl-3">
-                            <div class="card border-0 shadow-sm rounded-4 bg-body h-100">
-                                <div class="card-body p-4 text-center">
-                                    <div class="bg-success bg-opacity-10 text-success rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
-                                         style="width: 50px; height: 50px;">
-                                        <i class="bi bi-check-circle fs-4"></i>
-                                    </div>
-                                    <h6 class="text-muted small text-uppercase fw-bold mb-1">
-                                        En Stock
-                                    </h6>
-                                    <h4 class="fw-bold mb-0" id="inStock">-</h4>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- PRODUCTOS CON STOCK BAJO -->
-                        <div class="col-sm-6 col-xl-3">
-                            <div class="card border-0 shadow-sm rounded-4 bg-body h-100">
-                                <div class="card-body p-4 text-center">
-                                    <div class="bg-warning bg-opacity-10 text-warning rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
-                                         style="width: 50px; height: 50px;">
-                                        <i class="bi bi-exclamation-triangle fs-4"></i>
-                                    </div>
-                                    <h6 class="text-muted small text-uppercase fw-bold mb-1">
-                                        Stock Bajo
-                                    </h6>
-                                    <h4 class="fw-bold mb-0" id="lowStock">-</h4>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- VALOR TOTAL DEL INVENTARIO -->
-                        <div class="col-sm-6 col-xl-3">
-                            <div class="card border-0 shadow-sm rounded-4 bg-body h-100">
-                                <div class="card-body p-4 text-center">
-                                    <div class="bg-info bg-opacity-10 text-info rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
-                                         style="width: 50px; height: 50px;">
-                                        <i class="bi bi-currency-dollar fs-4"></i>
-                                    </div>
-                                    <h6 class="text-muted small text-uppercase fw-bold mb-1">
-                                        Valor Total
-                                    </h6>
-                                    <h4 class="fw-bold mb-0" id="totalValue">-</h4>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
                     <!-- =================================================
                          TARJETA PRINCIPAL: LISTADO DE PRODUCTOS
                     ================================================== -->
@@ -482,8 +407,3 @@ include __DIR__ . '/../partials/layouts/navbar.php';
      SCRIPT PRINCIPAL DE LA TABLA DE PRODUCTOS (AJAX)
 ===================================================== -->
 <script src="<?php echo BASE_URL; ?>assets/js/ajax/products-table.js"></script>
-
-<!-- =====================================================
-     ARCHIVO JS PARA ESTADÍSTICAS DE INVENTARIO
-===================================================== --> 
-<script src="<?php echo BASE_URL; ?>assets/js/ajax/inventory.js"></script>
