@@ -2,7 +2,7 @@
 
 document.addEventListener("DOMContentLoaded", function () {
   // Función reutilizable para cerrar modal y reenfocar
-  function cerrarModalYReenfocar(modalId, focusTargetId) {
+  function closeModalAndFocusTarget(modalId, focusTargetId) {
     const modalEl = document.getElementById(modalId);
     if (!modalEl) return;
     if (document.activeElement instanceof HTMLElement) {
@@ -193,7 +193,7 @@ document.addEventListener("DOMContentLoaded", function () {
         formatter: function (cell) {
           const row = cell.getData();
           if (!row.image_url) {
-            return '<div class="d-flex justify-content-center"><i class="fas fa-image text-muted" style="font-size:24px;"></i></div>';
+            return '<div class="d-flex justify-content-center"><i class="fas fa-image text-muted" style="font-size:25px;"></i></div>';
           }
           const version = row.image_version || Date.now();
           const src = BASE_URL + row.image_url + "?v=" + version;
@@ -679,7 +679,7 @@ if (e.target.classList.contains("delete-btn") || e.target.closest(".delete-btn")
               timer: 2000,
               showConfirmButton: false,
             });
-            cerrarModalYReenfocar("addProductModal", "addProductBtn");
+            closeModalAndFocusTarget("addProductModal", "addProductBtn");
             // Recargar página 1 para ver el nuevo registro
             table.setData("api/products.php?action=list"); // Recargar la tabla aquí
           } else {
@@ -798,7 +798,7 @@ if (e.target.classList.contains("delete-btn") || e.target.closest(".delete-btn")
               timer: 2000,
               showConfirmButton: false,
             });
-            cerrarModalYReenfocar("editProductModal", "table-search");
+            closeModalAndFocusTarget("editProductModal", "table-search");
             // Recarga la misma página para reflejar cambios
             table.setData("api/products.php?action=list"); // Recargar aquí también
           } else {
@@ -853,7 +853,7 @@ if (e.target.classList.contains("delete-btn") || e.target.closest(".delete-btn")
             // Recarga la misma página para reflejar eliminación
             table.setData("api/products.php?action=list"); // Recarga
             deleteProductID = null;
-            cerrarModalYReenfocar("deleteProductModal", "table-search");
+            closeModalAndFocusTarget("deleteProductModal", "table-search");
           } else {
             Swal.fire({
               icon: "error",
