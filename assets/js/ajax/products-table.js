@@ -43,6 +43,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
   //var deleteProductID = null;
 
+  // filtros activos (global, en el scope donde se crea `table`)
+let activeFilters = {
+  status: "",
+  stock: "",
+  priceFrom: "",
+  priceTo: "",
+  q: ""   // búsqueda (opcional)
+};
+
   console.log("Inicializando Tabulator con paginación remota...");
   var table = new Tabulator("#products-table", {
     layout: "fitColumns", // CAMBIADO: de fitDataFill a fitColumns para evitar columna vacía
@@ -59,7 +68,14 @@ document.addEventListener("DOMContentLoaded", function () {
     // Configuración AJAX
     ajaxURL: BASE_URL + "api/products.php?action=list",
     ajaxConfig: "GET",
-    ajaxParams: {},
+    ajaxParams: function () {
+      return {
+        status: activeFilters.status,
+        stock: activeFilters.stock,
+        priceFrom: activeFilters.priceFrom,
+        priceTo: activeFilters.priceTo
+      };
+    },    
     paginationDataSent: {
       page: "page",
       size: "size",
@@ -72,19 +88,34 @@ document.addEventListener("DOMContentLoaded", function () {
     },
 
     ajaxResponse: function (url, params, response) {
+      // restablecer opacidad
       document.querySelector("#products-table").style.opacity = "1";
 
-      if (response && Array.isArray(response.data)) {
+      // respuestas compatibles:
+      // 1) { last_page, page, total, data: [...] }
+      // 2) o directamente un array [...]
+      if (!response) return [];
+
+      if (Array.isArray(response.data)) {
         return response.data;
-      } else {
-        console.warn("Respuesta inesperada para ajaxResponse:", response);
-        return [];
       }
+
+      if (Array.isArray(response)) {
+        return response;
+      }
+
+      // fallback: si no hay array en data intentar detectar 'data' como objeto
+      if (Array.isArray(response)) return response;
+
+      console.warn("Respuesta inesperada para ajaxResponse:", response);
+      return [];
     },
 
     paginationDataReceived: {
       last_page: "last_page",
       data: "data",
+      page: "page",
+      total: "total"
     },
 
     // Configuración de columnas - TODAS VISIBLES CON ESPACIOS OPTIMIZADOS
@@ -1025,58 +1056,108 @@ if (e.target.classList.contains("delete-btn") || e.target.closest(".delete-btn")
     });
   }
 
-  // Esperar a que cargue todo el documento
-  document.addEventListener("DOMContentLoaded", function () {
-    const applyFiltersBtn = document.getElementById("applyFilters");
-    const clearFiltersBtn = document.getElementById("clearFilters");
+  // === FRAGMENTO CORREGIDO PARA LOS FILTROS (Pegar aquí UNA sola vez, dentro del mismo scope donde existe `table`) ===
+// --- Handlers de filtros (usar tamaño de página actual) ---
+(function setupFilterButtons() {
+  if (typeof table === "undefined" || !table) return;
 
-    // Cuando hagas clic en "Aplicar Filtros"
-    applyFiltersBtn.addEventListener("click", () => {
-      // Obtener los valores seleccionados de cada filtro
-      const status = document.getElementById("statusFilter").value;
-      const stock = document.getElementById("stockFilter").value;
-      const priceFrom = document.getElementById("priceFromFilter").value;
-      const priceTo = document.getElementById("priceToFilter").value;
+  const applyFiltersBtn = document.getElementById("applyFilters");
+  const clearFiltersBtn = document.getElementById("clearFilters");
 
-      // Cargar datos en la tabla usando Tabulator y enviando filtros por GET
+  function getPageSize() {
+    // Tabulator v4+ expone getPageSize()
+    try {
+      return typeof table.getPageSize === 'function' ? table.getPageSize() : 20;
+    } catch (e) {
+      return 20;
+    }
+  }
+
+  if (applyFiltersBtn) {
+    applyFiltersBtn.addEventListener("click", function () {
+      const status = (document.getElementById("statusFilter")?.value ?? '').trim();
+      const stock  = (document.getElementById("stockFilter")?.value ?? '').trim();
+      const priceFrom = (document.getElementById("priceFromFilter")?.value ?? '').trim();
+      const priceTo   = (document.getElementById("priceToFilter")?.value ?? '').trim();
+
       table.setData(`${BASE_URL}api/products.php?action=list`, {
         status: status,
         stock: stock,
         priceFrom: priceFrom,
         priceTo: priceTo,
+        page: 1,
+        size: getPageSize()
       });
     });
-  });
+  }
 
-  document
-    .getElementById("clearFilters")
-    .addEventListener("click", function () {
-      // Limpiar todos los campos del formulario
-      document.getElementById("statusFilter").value = "";
-      document.getElementById("stockFilter").value = "";
-      document.getElementById("priceFromFilter").value = "";
-      document.getElementById("priceToFilter").value = "";
+  if (clearFiltersBtn) {
+    clearFiltersBtn.addEventListener("click", function () {
+      const sf = document.getElementById("statusFilter");
+      const st = document.getElementById("stockFilter");
+      const pf = document.getElementById("priceFromFilter");
+      const pt = document.getElementById("priceToFilter");
 
-      // Recargar la tabla sin filtros (como si fuera la primera vez)
+      if (sf) sf.value = "";
+      if (st) st.value = "";
+      if (pf) pf.value = "";
+      if (pt) pt.value = "";
+
       table.setData(`${BASE_URL}api/products.php?action=list`, {
-        page: 1, // volver a la página 1
-        size: 5000, // puedes usar el valor que tú usas por defecto
+        page: 1,
+        size: getPageSize()
       });
     });
-
-  document
-    .getElementById("applyFilters")
-    .addEventListener("click", function () {
-      table.setData(`${BASE_URL}api/products.php?action=list`, {
-        status: document.getElementById("statusFilter").value,
-        stock: document.getElementById("stockFilter").value,
-        priceFrom: document.getElementById("priceFromFilter").value,
-        priceTo: document.getElementById("priceToFilter").value,
-        page: 1, // Reiniciar a la página 1
-        size: 5000, // Aumentar el tamaño de página para mostrar más resultados
-      });
-    });
+  }
+})();
 });
 
 document.getElementById;
 document.getElementById("edit-product-id");
+
+(function autoFilters() {
+  if (!table) return;
+
+  function applyAutoFilter() {
+    activeFilters.status = document.getElementById("statusFilter")?.value || "";
+    activeFilters.stock = document.getElementById("stockFilter")?.value || "";
+    activeFilters.priceFrom = document.getElementById("priceFromFilter")?.value || "";
+    activeFilters.priceTo = document.getElementById("priceToFilter")?.value || "";
+
+    // Volver siempre a página 1
+    table.setPage(1);
+    table.setData();
+  }
+
+  ["statusFilter", "stockFilter", "priceFromFilter", "priceToFilter"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener("change", applyAutoFilter);
+      el.addEventListener("input", debounce(applyAutoFilter, 400));
+    }
+  });
+
+  // Botón limpiar (este sí se queda)
+  const clearBtn = document.getElementById("clearFilters");
+  if (clearBtn) {
+    clearBtn.addEventListener("click", () => {
+      ["statusFilter", "stockFilter", "priceFromFilter", "priceToFilter"].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = "";
+      });
+
+      activeFilters = { status: "", stock: "", priceFrom: "", priceTo: "" };
+      table.setPage(1);
+      table.setData();
+    });
+  }
+
+  // Debounce simple
+  function debounce(fn, delay) {
+    let t;
+    return function () {
+      clearTimeout(t);
+      t = setTimeout(fn, delay);
+    };
+  }
+})();

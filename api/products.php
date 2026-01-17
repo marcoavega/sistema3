@@ -421,11 +421,10 @@ switch ($action) {
         }
 
         echo json_encode([
-            'success' => true,
-            'total' => $total,
-            'inStock' => $inStock,
-            'lowStock' => $lowStock,
-            'totalValue' => number_format($totalValue, 2)
+            "last_page" => max(1, (int) ceil($total / $size)),
+            "page"      => $page,
+            "total"     => $total,
+            "data"      => $rows
         ]);
         break;
 
