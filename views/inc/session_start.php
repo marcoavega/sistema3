@@ -1,4 +1,5 @@
 <?php
+// views/inc/session_start.php
 // **Verificación y configuración de la sesión**
 if (session_status() === PHP_SESSION_NONE) {
     // `session_status()` verifica el estado actual de la sesión.

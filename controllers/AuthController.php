@@ -1,4 +1,5 @@
 <?php
+// controllers/AuthController.php
 // Se importa el modelo `User`, que contiene la lógica para acceder a la base de datos de usuarios.
 require_once __DIR__ . '/../models/User.php';
 

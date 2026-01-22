@@ -1,4 +1,12 @@
 // Archivo: assets/js/ajax/products-table.js
+let table = null;
+
+let activeFilters = {
+  status: "",
+  stock: "",
+  priceFrom: "",
+  priceTo: ""
+};
 
 document.addEventListener("DOMContentLoaded", function () {
   // Función reutilizable para cerrar modal y reenfocar
@@ -43,17 +51,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
   //var deleteProductID = null;
 
-  // filtros activos (global, en el scope donde se crea `table`)
-let activeFilters = {
-  status: "",
-  stock: "",
-  priceFrom: "",
-  priceTo: "",
-  q: ""   // búsqueda (opcional)
-};
 
   console.log("Inicializando Tabulator con paginación remota...");
-  var table = new Tabulator("#products-table", {
+  table = new Tabulator("#products-table", {
     layout: "fitColumns", // CAMBIADO: de fitDataFill a fitColumns para evitar columna vacía
     placeholder: "Cargando productos...",
 
@@ -75,7 +75,7 @@ let activeFilters = {
         priceFrom: activeFilters.priceFrom,
         priceTo: activeFilters.priceTo
       };
-    },    
+    },
     paginationDataSent: {
       page: "page",
       size: "size",
@@ -327,67 +327,67 @@ let activeFilters = {
           ) {
 
             // ELIMINAR
-// --- DENTRO DE cellClick -> ELIMINAR ---
-if (e.target.classList.contains("delete-btn") || e.target.closest(".delete-btn")) {
-  const productId = rowData.product_id;
-  const productName = rowData.product_name || '';
-  const stockActual = parseInt(rowData.stock) || 0;
+            // --- DENTRO DE cellClick -> ELIMINAR ---
+            if (e.target.classList.contains("delete-btn") || e.target.closest(".delete-btn")) {
+              const productId = rowData.product_id;
+              const productName = rowData.product_name || '';
+              const stockActual = parseInt(rowData.stock) || 0;
 
-  // Configuración dinámica del mensaje
-  let title = '¿Eliminar producto?';
-  let icon = 'warning';
-  let htmlContent = `Estás a punto de eliminar <strong>${productName}</strong>.`;
+              // Configuración dinámica del mensaje
+              let title = '¿Eliminar producto?';
+              let icon = 'warning';
+              let htmlContent = `Estás a punto de eliminar <strong>${productName}</strong>.`;
 
-  // Si hay stock, cambiamos la advertencia a algo más serio
-  if (stockActual > 0) {
-      title = '<span style="color: #d33">¡Atención: Stock Disponible!</span>';
-      icon = 'error';
-      htmlContent = `El producto <strong>${productName}</strong> todavía tiene <strong>${stockActual} unidades</strong> en existencia.<br><br><span class="text-danger fw-bold">¿Realmente deseas eliminarlo? Esto afectará los inventarios.</span>`;
-  }
-
-  Swal.fire({
-      title: title,
-      html: htmlContent,
-      icon: icon,
-      showCancelButton: true,
-      confirmButtonText: 'Sí, eliminar de todos modos',
-      cancelButtonText: 'Cancelar',
-      buttonsStyling: false,
-      customClass: {
-          confirmButton: 'btn btn-danger px-4',
-          cancelButton: 'btn btn-secondary ms-2'
-      }
-  }).then((result) => {
-      if (result.isConfirmed) {
-          // Ejecutar la petición fetch para borrar
-          fetch(BASE_URL + "api/products.php?action=delete", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ product_id: productId, product_name: productName }),
-          })
-          .then(res => res.json())
-          .then(data => {
-              if (data.success) {
-                  Swal.fire({
-                      icon: "success",
-                      title: "Eliminado",
-                      text: "El producto ha sido borrado y el log registrado.",
-                      toast: true,
-                      position: "top-end",
-                      timer: 3000,
-                      showConfirmButton: false
-                  });
-                  table.setData(); // Recargar tabla
-              } else {
-                  throw new Error(data.message);
+              // Si hay stock, cambiamos la advertencia a algo más serio
+              if (stockActual > 0) {
+                title = '<span style="color: #d33">¡Atención: Stock Disponible!</span>';
+                icon = 'error';
+                htmlContent = `El producto <strong>${productName}</strong> todavía tiene <strong>${stockActual} unidades</strong> en existencia.<br><br><span class="text-danger fw-bold">¿Realmente deseas eliminarlo? Esto afectará los inventarios.</span>`;
               }
-          })
-          .catch(err => {
-              Swal.fire("Error", err.message, "error");
-          });
-      }
-  });
-}
+
+              Swal.fire({
+                title: title,
+                html: htmlContent,
+                icon: icon,
+                showCancelButton: true,
+                confirmButtonText: 'Sí, eliminar de todos modos',
+                cancelButtonText: 'Cancelar',
+                buttonsStyling: false,
+                customClass: {
+                  confirmButton: 'btn btn-danger px-4',
+                  cancelButton: 'btn btn-secondary ms-2'
+                }
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  // Ejecutar la petición fetch para borrar
+                  fetch(BASE_URL + "api/products.php?action=delete", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ product_id: productId, product_name: productName }),
+                  })
+                    .then(res => res.json())
+                    .then(data => {
+                      if (data.success) {
+                        Swal.fire({
+                          icon: "success",
+                          title: "Eliminado",
+                          text: "El producto ha sido borrado y el log registrado.",
+                          toast: true,
+                          position: "top-end",
+                          timer: 3000,
+                          showConfirmButton: false
+                        });
+                        table.setData(); // Recargar tabla
+                      } else {
+                        throw new Error(data.message);
+                      }
+                    })
+                    .catch(err => {
+                      Swal.fire("Error", err.message, "error");
+                    });
+                }
+              });
+            }
 
             /*
             deleteProductID = rowData.product_id;
@@ -421,31 +421,113 @@ if (e.target.classList.contains("delete-btn") || e.target.closest(".delete-btn")
   });
 
 
+  // --- Definición de autoFilters (no se ejecuta automáticamente)
+  // --- Inicializador seguro de filtros: espera a que 'table' exista y evita inicializar dos veces
+  (function safeAutoFilters() {
+    let initialized = false;
+
+    function init() {
+      if (initialized) return;
+      if (!table) {
+        // si table aún no existe, reintenta en 60ms (evita race conditions)
+        setTimeout(init, 60);
+        return;
+      }
+      initialized = true;
+
+      function applyAutoFilter() {
+        // Si por alguna razón table desapareció, abortar
+        if (!table) return;
+
+        activeFilters.status = document.getElementById("statusFilter")?.value || "";
+        activeFilters.stock = document.getElementById("stockFilter")?.value || "";
+        activeFilters.priceFrom = document.getElementById("priceFromFilter")?.value || "";
+        activeFilters.priceTo = document.getElementById("priceToFilter")?.value || "";
+
+        console.log("applyAutoFilter -> filtros:", activeFilters);
+        // volver a página 1 y pedir los datos remotos con los filtros nuevos
+        try {
+          table.setPage(1);
+          // replaceData hace que Tabulator llame a ajaxURL usando ajaxParams
+          if (typeof table.replaceData === "function") {
+            table.replaceData();
+          } else {
+            // fallback por compatibilidad
+            table.setData();
+          }
+        } catch (err) {
+          console.warn("Error al forzar recarga de datos en table:", err);
+        }
+      }
+
+      function debounce(fn, delay) {
+        let t;
+        return function () {
+          clearTimeout(t);
+          t = setTimeout(fn, delay);
+        };
+      }
+
+      ["statusFilter", "stockFilter", "priceFromFilter", "priceToFilter"].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.addEventListener("change", applyAutoFilter);
+        el.addEventListener("input", debounce(applyAutoFilter, 400));
+      });
+
+      const clearBtn = document.getElementById("clearFilters");
+      if (clearBtn) {
+        clearBtn.addEventListener("click", function () {
+          ["statusFilter", "stockFilter", "priceFromFilter", "priceToFilter"].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.value = "";
+          });
+
+          activeFilters = { status: "", stock: "", priceFrom: "", priceTo: "" };
+          table.setPage(1);
+          if (typeof table.replaceData === "function") table.replaceData();
+          else table.setData();
+        });
+      }
+
+      console.log("autoFilters inicializado correctamente");
+    }
+
+    // Ejecutar init dentro de DOMContentLoaded: si ya estamos dentro, init() se invoca; si no, esperará.
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", init);
+    } else {
+      init();
+    }
+  })();
+
+
+
   // --- Preview imagen: al hacer click en miniatura de la tabla abre #imagePreviewModal ---
-(function setupImagePreviewFromTable() {
-  const tableContainer = document.querySelector("#products-table");
-  const previewModalEl = document.getElementById("imagePreviewModal");
-  const previewImg = document.getElementById("imagePreviewModalImg");
+  (function setupImagePreviewFromTable() {
+    const tableContainer = document.querySelector("#products-table");
+    const previewModalEl = document.getElementById("imagePreviewModal");
+    const previewImg = document.getElementById("imagePreviewModalImg");
 
-  if (!tableContainer) return;
-  if (!previewModalEl || !previewImg) {
-    console.warn("Modal de imagen no encontrado. Agrega #imagePreviewModal y #imagePreviewModalImg en la vista de lista.");
-    return;
-  }
+    if (!tableContainer) return;
+    if (!previewModalEl || !previewImg) {
+      console.warn("Modal de imagen no encontrado. Agrega #imagePreviewModal y #imagePreviewModalImg en la vista de lista.");
+      return;
+    }
 
-  tableContainer.addEventListener("click", function (e) {
-    const clicked = e.target.closest(".product-thumb");
-    if (!clicked) return;
-    const src = clicked.dataset.src || clicked.getAttribute("src");
-    if (!src) return;
+    tableContainer.addEventListener("click", function (e) {
+      const clicked = e.target.closest(".product-thumb");
+      if (!clicked) return;
+      const src = clicked.dataset.src || clicked.getAttribute("src");
+      if (!src) return;
 
-    previewImg.src = src + (src.includes("?") ? "&" : "?") + "v=" + Date.now();
-    previewImg.alt = clicked.alt || "Imagen del producto";
+      previewImg.src = src + (src.includes("?") ? "&" : "?") + "v=" + Date.now();
+      previewImg.alt = clicked.alt || "Imagen del producto";
 
-    const modal = new bootstrap.Modal(previewModalEl);
-    modal.show();
-  });
-})();
+      const modal = new bootstrap.Modal(previewModalEl);
+      modal.show();
+    });
+  })();
 
 
 
@@ -712,7 +794,9 @@ if (e.target.classList.contains("delete-btn") || e.target.closest(".delete-btn")
             });
             closeModalAndFocusTarget("addProductModal", "addProductBtn");
             // Recargar página 1 para ver el nuevo registro
-            table.setData("api/products.php?action=list"); // Recargar la tabla aquí
+            //table.setData("api/products.php?action=list"); // Recargar la tabla aquí
+            table.setPage(1);
+            table.replaceData();
           } else {
             Swal.fire({
               icon: "error",
@@ -831,7 +915,9 @@ if (e.target.classList.contains("delete-btn") || e.target.closest(".delete-btn")
             });
             closeModalAndFocusTarget("editProductModal", "table-search");
             // Recarga la misma página para reflejar cambios
-            table.setData("api/products.php?action=list"); // Recargar aquí también
+            //table.setData("api/products.php?action=list"); // Recargar aquí también
+            table.setPage(1);
+            table.replaceData();
           } else {
             Swal.fire({
               icon: "error",
@@ -847,59 +933,7 @@ if (e.target.classList.contains("delete-btn") || e.target.closest(".delete-btn")
     });
   }
 
-  /*
-  // === CRUD: eliminar producto ===
-  if (confirmDeleteBtn) {
-    confirmDeleteBtn.addEventListener("click", function () {
-      if (!deleteProductID) return;
-      fetch(BASE_URL + "api/products.php?action=delete", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ product_id: deleteProductID }),
-      })
-        .then((res) => {
-          if (!res.ok) {
-            return res.text().then((text) => {
-              console.error(
-                "Error al eliminar producto. Status:",
-                res.status,
-                "Body:",
-                text
-              );
-              throw new Error("Error al eliminar producto");
-            });
-          }
-          return res.json();
-        })
-        .then((data) => {
-          if (data.success) {
-            Swal.fire({
-              icon: "success",
-              title: "Producto eliminado con éxito",
-              toast: true,
-              position: "top-end",
-              timer: 2000,
-              showConfirmButton: false,
-            });
-            // Recarga la misma página para reflejar eliminación
-            table.setData("api/products.php?action=list"); // Recarga
-            deleteProductID = null;
-            closeModalAndFocusTarget("deleteProductModal", "table-search");
-          } else {
-            Swal.fire({
-              icon: "error",
-              title: "Error al eliminar",
-              text: data.message || "",
-            });
-          }
-        })
-        .catch((err) => {
-          console.error(err);
-          Swal.fire({ icon: "error", title: "Error en eliminación" });
-        });
-    });
-  }
-  */
+
 
   // EXPORTAR CSV
   var exportCSVBtn = document.getElementById("exportCSVBtn");
@@ -1056,108 +1090,10 @@ if (e.target.classList.contains("delete-btn") || e.target.closest(".delete-btn")
     });
   }
 
-  // === FRAGMENTO CORREGIDO PARA LOS FILTROS (Pegar aquí UNA sola vez, dentro del mismo scope donde existe `table`) ===
-// --- Handlers de filtros (usar tamaño de página actual) ---
-(function setupFilterButtons() {
-  if (typeof table === "undefined" || !table) return;
 
-  const applyFiltersBtn = document.getElementById("applyFilters");
-  const clearFiltersBtn = document.getElementById("clearFilters");
 
-  function getPageSize() {
-    // Tabulator v4+ expone getPageSize()
-    try {
-      return typeof table.getPageSize === 'function' ? table.getPageSize() : 20;
-    } catch (e) {
-      return 20;
-    }
-  }
-
-  if (applyFiltersBtn) {
-    applyFiltersBtn.addEventListener("click", function () {
-      const status = (document.getElementById("statusFilter")?.value ?? '').trim();
-      const stock  = (document.getElementById("stockFilter")?.value ?? '').trim();
-      const priceFrom = (document.getElementById("priceFromFilter")?.value ?? '').trim();
-      const priceTo   = (document.getElementById("priceToFilter")?.value ?? '').trim();
-
-      table.setData(`${BASE_URL}api/products.php?action=list`, {
-        status: status,
-        stock: stock,
-        priceFrom: priceFrom,
-        priceTo: priceTo,
-        page: 1,
-        size: getPageSize()
-      });
-    });
-  }
-
-  if (clearFiltersBtn) {
-    clearFiltersBtn.addEventListener("click", function () {
-      const sf = document.getElementById("statusFilter");
-      const st = document.getElementById("stockFilter");
-      const pf = document.getElementById("priceFromFilter");
-      const pt = document.getElementById("priceToFilter");
-
-      if (sf) sf.value = "";
-      if (st) st.value = "";
-      if (pf) pf.value = "";
-      if (pt) pt.value = "";
-
-      table.setData(`${BASE_URL}api/products.php?action=list`, {
-        page: 1,
-        size: getPageSize()
-      });
-    });
-  }
-})();
 });
 
-document.getElementById;
-document.getElementById("edit-product-id");
 
-(function autoFilters() {
-  if (!table) return;
 
-  function applyAutoFilter() {
-    activeFilters.status = document.getElementById("statusFilter")?.value || "";
-    activeFilters.stock = document.getElementById("stockFilter")?.value || "";
-    activeFilters.priceFrom = document.getElementById("priceFromFilter")?.value || "";
-    activeFilters.priceTo = document.getElementById("priceToFilter")?.value || "";
 
-    // Volver siempre a página 1
-    table.setPage(1);
-    table.setData();
-  }
-
-  ["statusFilter", "stockFilter", "priceFromFilter", "priceToFilter"].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) {
-      el.addEventListener("change", applyAutoFilter);
-      el.addEventListener("input", debounce(applyAutoFilter, 400));
-    }
-  });
-
-  // Botón limpiar (este sí se queda)
-  const clearBtn = document.getElementById("clearFilters");
-  if (clearBtn) {
-    clearBtn.addEventListener("click", () => {
-      ["statusFilter", "stockFilter", "priceFromFilter", "priceToFilter"].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.value = "";
-      });
-
-      activeFilters = { status: "", stock: "", priceFrom: "", priceTo: "" };
-      table.setPage(1);
-      table.setData();
-    });
-  }
-
-  // Debounce simple
-  function debounce(fn, delay) {
-    let t;
-    return function () {
-      clearTimeout(t);
-      t = setTimeout(fn, delay);
-    };
-  }
-})();

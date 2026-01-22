@@ -353,9 +353,6 @@ $username = htmlspecialchars($_SESSION['user']['username']);
 
                                                 <!-- BOTONES DE FILTRO -->
                                                 <div class="col-md-6 d-flex align-items-end gap-2">
-                                                    <button class="btn btn-primary px-4" id="applyFilters">
-                                                        Aplicar
-                                                    </button>
                                                     <button class="btn btn-light border px-4" id="clearFilters">
                                                         Limpiar
                                                     </button>
