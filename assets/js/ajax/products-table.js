@@ -9,6 +9,24 @@ let activeFilters = {
 };
 
 document.addEventListener("DOMContentLoaded", function () {
+
+  // Al inicio de DOMContentLoaded (o justo después de que exista el DOM)
+const perms = window.USER_PERMISSIONS?.products || { view: true, create: false, edit: false, delete: false, report: false };
+
+// Ocultar botón de "Nuevo Producto" si no tiene create
+if (!perms.create) {
+  document.getElementById('addProductBtn')?.classList.add('d-none');
+}
+
+// Ocultar/ocultar opciones de export si no tiene report
+if (!perms.report) {
+  document.getElementById('exportCSVBtn')?.remove();
+  document.getElementById('exportExcelBtn')?.remove();
+  document.getElementById('exportPDFBtn')?.remove();
+  document.getElementById('exportJSONBtn')?.remove();
+}
+
+
   // Función reutilizable para cerrar modal y reenfocar
   function closeModalAndFocusTarget(modalId, focusTargetId) {
     const modalEl = document.getElementById(modalId);

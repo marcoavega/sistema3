@@ -400,6 +400,15 @@ $content = ob_get_clean();
 include __DIR__ . '/../partials/layouts/navbar.php';
 ?>
 
+<script>
+  // Exportar permisos del servidor al frontend (solo lectura)
+  window.USER_PERMISSIONS = {
+    products: <?php echo json_encode($_SESSION['permissions']['products'] ?? [
+      'view'=> true, 'create'=> false, 'edit'=> false, 'delete'=> false, 'report'=> false
+    ]); ?>
+  };
+</script>
+
 <!-- =====================================================
      SCRIPT PRINCIPAL DE LA TABLA DE PRODUCTOS (AJAX)
 ===================================================== -->

@@ -126,6 +126,12 @@ switch ($action) {
     case 'create':
         header('Content-Type: application/json');
         session_start();
+        
+if (!($_SESSION['permissions']['products']['create'] ?? false)) {
+    http_response_code(403);
+    echo json_encode(['success' => false, 'message' => 'No autorizado (create)']);
+    exit;
+}
 
         require_once __DIR__ . '/../models/Database.php';
         $db = (new Database())->getConnection();
@@ -221,12 +227,21 @@ switch ($action) {
         }
 
         echo json_encode(['success' => true, 'product' => $product]);
+        
         break;
 
 
 
     case 'update':
         header('Content-Type: application/json');
+
+        session_start();
+        if (!($_SESSION['permissions']['products']['edit'] ?? false)) {
+    http_response_code(403);
+    echo json_encode(['success' => false, 'message' => 'No autorizado (update)']);
+    exit;
+}
+
         require_once __DIR__ . '/../models/Database.php';
         $db = (new Database())->getConnection();
         require_once __DIR__ . '/../controllers/ProductController.php';
@@ -345,6 +360,13 @@ switch ($action) {
 
 
     case 'delete':
+
+        if (!($_SESSION['permissions']['products']['edit'] ?? false)) {
+    http_response_code(403);
+    echo json_encode(['success' => false, 'message' => 'No autorizado (update)']);
+    exit;
+}
+
         $raw = file_get_contents('php://input');
         $payload = json_decode($raw, true);
         if (json_last_error() !== JSON_ERROR_NONE) {
