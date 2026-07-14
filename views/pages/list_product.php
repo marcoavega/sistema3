@@ -353,9 +353,6 @@ $username = htmlspecialchars($_SESSION['user']['username']);
 
                                                 <!-- BOTONES DE FILTRO -->
                                                 <div class="col-md-6 d-flex align-items-end gap-2">
-                                                    <button class="btn btn-primary px-4" id="applyFilters">
-                                                        Aplicar
-                                                    </button>
                                                     <button class="btn btn-light border px-4" id="clearFilters">
                                                         Limpiar
                                                     </button>
@@ -402,6 +399,15 @@ $username = htmlspecialchars($_SESSION['user']['username']);
 $content = ob_get_clean();
 include __DIR__ . '/../partials/layouts/navbar.php';
 ?>
+
+<script>
+  // Exportar permisos del servidor al frontend (solo lectura)
+  window.USER_PERMISSIONS = {
+    products: <?php echo json_encode($_SESSION['permissions']['products'] ?? [
+      'view'=> true, 'create'=> false, 'edit'=> false, 'delete'=> false, 'report'=> false
+    ]); ?>
+  };
+</script>
 
 <!-- =====================================================
      SCRIPT PRINCIPAL DE LA TABLA DE PRODUCTOS (AJAX)

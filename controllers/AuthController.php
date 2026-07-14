@@ -1,4 +1,5 @@
 <?php
+// controllers/AuthController.php
 // Se importa el modelo `User`, que contiene la lógica para acceder a la base de datos de usuarios.
 require_once __DIR__ . '/../models/User.php';
 
@@ -68,6 +69,13 @@ class AuthController
                     'img_url'    => $user['img_url'], // URL de la imagen de perfil
                     'description_level' => $user['description_level'] // Descripción del rol
                 ];
+
+                // CARGAR HELPER DE PERMISOS
+require_once __DIR__ . '/../helpers/PermissionHelper.php';
+
+// Asignar permisos en sesión
+$level = (int)($user['level_user'] ?? 0);
+$_SESSION['permissions'] = PermissionHelper::getPermissionsByLevel($level);
 
                 // Se registra la acción de login del usuario en el sistema de bitácora.
                 Logger::logAction($user['user_id'], 'login');

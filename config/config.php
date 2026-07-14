@@ -10,19 +10,29 @@ error_reporting(E_ALL); // Se configuran todos los niveles de error para reporta
 // **Definición de constantes globales**
 // Estas constantes se usan en todo el sistema para evitar redundancia y facilitar cambios futuros.
 
-// **URL Base del sistema**
+/* **URL Base del sistema**
 define('BASE_URL', 'http://localhost/sistema003/');
-// Define la URL base del sistema, útil para generar enlaces en la aplicación.
+// Define la URL base del sistema, útil para generar enlaces en la aplicación.*/
+
+// **URL Base del sistema**
+define('BASE_URL', 'http://localhost/'); // ¡Le quitamos el 'sistema003/'!
 
 // **Nombre de la aplicación**
 define('APP_NAME','SISTEMA DE GESTIÓN'); 
 // Define el nombre del sistema, puede ser útil para mostrarlo en títulos y encabezados.
 
-// **Credenciales de la Base de Datos**
+/* **Credenciales de la Base de Datos**
 define('DB_HOST','localhost'); // Dirección del servidor de la base de datos.
 define('DB_NAME','sistema'); // Nombre de la base de datos usada por la aplicación.
 define('DB_USER','root'); // Usuario de la base de datos (en entornos de producción se recomienda cambiar esto).
 define('DB_PASS',''); // Contraseña del usuario de la base de datos (en producción nunca debe estar en código público).
+*/
+
+// **Credenciales de la Base de Datos**
+define('DB_HOST','db'); // ¡Cambiado de 'localhost' a 'db'!
+define('DB_NAME','sistema'); // El nombre se queda igual
+define('DB_USER','marco'); // Tu usuario de Docker
+define('DB_PASS','3298'); // Tu contraseña de Docker
 
 // **Configuración de la sesión**
 define('APP_SESSION_NAME','sistema003_session'); 

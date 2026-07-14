@@ -1,0 +1,8 @@
+# Ignorar dependencias o archivos de entorno si los usas
+.env
+vendor/
+node_modules/
+
+# Ignorar archivos del sistema operativo
+.DS_Store
+Thumbs.db

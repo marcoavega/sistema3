@@ -1,4 +1,5 @@
 <?php
+ob_start(); // <-- ¡AGREGA ESTA LÍNEA AQUÍ!
 // Carga las configuraciones generales del sistema (constantes, rutas, etc.)
 require_once 'config/config.php';
 

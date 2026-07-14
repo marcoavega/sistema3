@@ -1,0 +1,37 @@
+services:
+  # 1. Contenedor del Servidor Web y PHP
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: servidor_web
+    ports:
+      - "80:80"
+    volumes:
+      - ./:/var/www/html/ 
+    depends_on:
+      - db
+
+  # 2. Contenedor de la Base de Datos MySQL
+  db:
+    image: mysql:8.0
+    container_name: base_datos_mysql
+    command: --log_bin_trust_function_creators=1
+    environment:
+      MYSQL_ROOT_PASSWORD: 3298
+      MYSQL_DATABASE: sistema
+      MYSQL_USER: marco
+      MYSQL_PASSWORD: 3298
+    ports:
+      - "3306:3306"
+
+  # 3. Contenedor de phpMyAdmin
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: base_datos_admin
+    environment:
+      PMA_HOST: db
+    ports:
+      - "8080:80"
+    depends_on:
+      - db
