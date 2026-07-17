@@ -21,45 +21,45 @@ $username = htmlspecialchars($_SESSION['user']['username']);
 ?>
 
 <style>
-    /* Estilos Soft UI para botones de acción en tabla */
-    .btn-soft-primary {
-        background-color: rgba(13, 110, 253, 0.1);
-        color: #0d6efd;
-        border: none;
-        transition: all 0.2s ease;
-    }
+/* Estilos Soft UI para botones de acción en tabla */
+.btn-soft-primary {
+    background-color: rgba(13, 110, 253, 0.1);
+    color: #0d6efd;
+    border: none;
+    transition: all 0.2s ease;
+}
 
-    .btn-soft-primary:hover {
-        background-color: #0d6efd;
-        color: white;
-    }
+.btn-soft-primary:hover {
+    background-color: #0d6efd;
+    color: white;
+}
 
-    .btn-soft-danger {
-        background-color: rgba(220, 53, 69, 0.1);
-        color: #dc3545;
-        border: none;
-        transition: all 0.2s ease;
-    }
+.btn-soft-danger {
+    background-color: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+    border: none;
+    transition: all 0.2s ease;
+}
 
-    .btn-soft-danger:hover {
-        background-color: #dc3545;
-        color: white;
-    }
+.btn-soft-danger:hover {
+    background-color: #dc3545;
+    color: white;
+}
 
-    /* Ajuste responsivo Botón Nuevo Almacén */
-    @media (max-width: 767px) {
-        .btn-responsive-add {
-            width: 100%;
-        }
+/* Ajuste responsivo Botón Nuevo Almacén */
+@media (max-width: 767px) {
+    .btn-responsive-add {
+        width: 100%;
     }
+}
 
-    @media (min-width: 768px) {
-        .btn-responsive-add {
-            width: auto;
-            padding-left: 1.5rem;
-            padding-right: 1.5rem;
-        }
+@media (min-width: 768px) {
+    .btn-responsive-add {
+        width: auto;
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
     }
+}
 </style>
 
 <div class="container-fluid m-0 p-0 min-vh-100 bg-body-tertiary" data-bs-theme="auto">
@@ -75,7 +75,8 @@ $username = htmlspecialchars($_SESSION['user']['username']);
                         <div class="col-8 col-md-6">
                             <nav aria-label="breadcrumb">
                                 <ol class="breadcrumb mb-2 small">
-                                    <li class="breadcrumb-item"><a href="<?= BASE_URL ?>dashboard" class="text-decoration-none">Dashboard</a></li>
+                                    <li class="breadcrumb-item"><a href="<?= BASE_URL ?>dashboard"
+                                            class="text-decoration-none">Dashboard</a></li>
                                     <li class="breadcrumb-item active text-muted border-0">Almacenes</li>
                                 </ol>
                             </nav>
@@ -85,16 +86,18 @@ $username = htmlspecialchars($_SESSION['user']['username']);
                         </div>
 
                         <div class="col-4 d-md-none text-end">
-                            <button class="btn btn-outline-primary shadow-sm" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileMenu">
+                            <button class="btn btn-outline-primary shadow-sm" type="button" data-bs-toggle="offcanvas"
+                                data-bs-target="#mobileMenu">
                                 <i class="bi bi-list fs-5"></i>
                             </button>
                         </div>
 
                         <div class="col-12 col-md-6 text-md-end">
                             <?php if ($canCreate): ?>
-                                <button id="addWarehouseBtn" class="btn btn-primary rounded-pill shadow-sm btn-responsive-add">
-                                    <i class="fas fa-plus-circle me-2"></i>Nuevo Almacén
-                                </button>
+                            <button id="addWarehouseBtn"
+                                class="btn btn-primary rounded-pill shadow-sm btn-responsive-add">
+                                <i class="fas fa-plus-circle me-2"></i>Nuevo Almacén
+                            </button>
                             <?php endif; ?>
                         </div>
                     </div>
@@ -104,70 +107,70 @@ $username = htmlspecialchars($_SESSION['user']['username']);
             <div class="container-fluid px-4 py-4">
                 <div class="card shadow-sm border-0 rounded-4 bg-body">
 
-                
+
 
                     <div class="card-header p-4 bg-transparent border-bottom-0">
                         <h5 class="mb-1 fw-bold text-primary">Listado de Ubicaciones</h5>
                         <p class="mb-0 text-muted small">Administra tus puntos de almacenamiento y stock físico</p>
                     </div>
 
-<!-- ===== BÚSQUEDA Y EXPORTACIÓN ===== -->
-<div class="row g-3 mb-4">
+                    <!-- ===== BÚSQUEDA Y EXPORTACIÓN ===== -->
+                    <div class="row g-3 mb-4">
 
-<!-- BUSCADOR -->
-<div class="col-md-6">
-    <div class="position-relative">
-        <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
-        <input type="text"
-               id="table-search"
-               class="form-control ps-5 rounded-pill border-2"
-               placeholder="Buscar Almacene...">
-    </div>
-</div>
+                        <!-- BUSCADOR -->
+                        <div class="col-md-6">
+                            <div class="position-relative">
+                                <i
+                                    class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+                                <input type="text" id="table-search" class="form-control ps-5 rounded-pill border-2"
+                                    placeholder="Buscar Almacene...">
+                            </div>
+                        </div>
 
-<!-- EXPORTACIÓN -->
-<div class="col-md-6 text-md-end">
-    <div class="dropdown d-inline-block">
-        <button class="btn btn-outline-secondary dropdown-toggle rounded-pill px-4"
-                type="button"
-                data-bs-toggle="dropdown">
-            <i class="bi bi-download me-2"></i>
-            Exportar
-        </button>
+                        <!-- EXPORTACIÓN -->
+                        <div class="col-md-6 text-md-end">
+                            <div class="dropdown d-inline-block">
+                                <button class="btn btn-outline-secondary dropdown-toggle rounded-pill px-4"
+                                    type="button" data-bs-toggle="dropdown">
+                                    <i class="bi bi-download me-2"></i>
+                                    Exportar
+                                </button>
 
-        <!-- OPCIONES DE EXPORTACIÓN -->
-        <ul class="dropdown-menu shadow-lg border-0">
-            <li>
-                <button id="exportCSVBtn" class="dropdown-item">
-                    <i class="bi bi-filetype-csv me-2 text-success"></i>
-                    CSV
-                </button>
-            </li>
-            <li>
-                <button id="exportExcelBtn" class="dropdown-item">
-                    <i class="bi bi-file-earmark-excel me-2 text-success"></i>
-                    Excel
-                </button>
-            </li>
-            <li>
-                <button id="exportPDFBtn" class="dropdown-item">
-                    <i class="bi bi-file-earmark-pdf me-2 text-danger"></i>
-                    PDF
-                </button>
-            </li>
-        </ul>
-    </div>
-</div>
-</div>
+                                <!-- OPCIONES DE EXPORTACIÓN -->
+                                <ul class="dropdown-menu shadow-lg border-0">
+                                    <li>
+                                        <button id="exportCSVBtn" class="dropdown-item">
+                                            <i class="bi bi-filetype-csv me-2 text-success"></i>
+                                            CSV
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <button id="exportExcelBtn" class="dropdown-item">
+                                            <i class="bi bi-file-earmark-excel me-2 text-success"></i>
+                                            Excel
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <button id="exportPDFBtn" class="dropdown-item">
+                                            <i class="bi bi-file-earmark-pdf me-2 text-danger"></i>
+                                            PDF
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
 
                     <div class="card-body p-4 pt-0">
                         <div class="table-responsive border rounded-3">
                             <table class="table table-hover align-middle mb-0">
                                 <thead class="bg-light">
                                     <tr>
-                                        <th class="py-3 px-4 text-muted fw-bold small text-uppercase" style="width:100px;"># ID</th>
+                                        <th class="py-3 px-4 text-muted fw-bold small text-uppercase"
+                                            style="width:100px;"># ID</th>
                                         <th class="py-3 text-muted fw-bold small text-uppercase">Nombre del Almacén</th>
-                                        <th class="py-3 px-4 text-center text-muted fw-bold small text-uppercase" style="width:120px;">Acciones</th>
+                                        <th class="py-3 px-4 text-center text-muted fw-bold small text-uppercase"
+                                            style="width:120px;">Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody id="warehouses-tbody" class="border-top-0">
@@ -197,34 +200,35 @@ $username = htmlspecialchars($_SESSION['user']['username']);
                                 $itemIcon = htmlspecialchars($item['icon'] ?? 'circle');
                                 $itemLabel = htmlspecialchars($item['label'] ?? $route);
                         ?>
-                                <a href="<?= BASE_URL . $route ?>"
-                                    class="list-group-item list-group-item-action border-0 py-3 px-4 d-flex align-items-center <?= ($isActiveParent || $isSubActive) ? 'bg-primary-subtle text-primary border-start border-4 border-primary fw-bold' : 'text-body' ?>">
-                                    <i class="bi bi-<?= $itemIcon ?> me-3 fs-5"></i>
-                                    <?= $itemLabel ?>
-                                </a>
+                        <a href="<?= BASE_URL . $route ?>"
+                            class="list-group-item list-group-item-action border-0 py-3 px-4 d-flex align-items-center <?= ($isActiveParent || $isSubActive) ? 'bg-primary-subtle text-primary border-start border-4 border-primary fw-bold' : 'text-body' ?>">
+                            <i class="bi bi-<?= $itemIcon ?> me-3 fs-5"></i>
+                            <?= $itemLabel ?>
+                        </a>
 
-                                <?php if (isset($item['submenu'])): ?>
-                                    <div class="bg-body-tertiary shadow-inner">
-                                        <?php foreach ($item['submenu'] as $subRoute => $subItem):
+                        <?php if (isset($item['submenu'])): ?>
+                        <div class="bg-body-tertiary shadow-inner">
+                            <?php foreach ($item['submenu'] as $subRoute => $subItem):
                                             $isSubItemActive = ($segment === $subRoute);
                                             $subIcon = htmlspecialchars($subItem['icon'] ?? 'circle');
                                             $subLabel = htmlspecialchars($subItem['label'] ?? $subRoute);
                                         ?>
-                                            <a href="<?= BASE_URL . $subRoute ?>"
-                                                class="list-group-item list-group-item-action border-0 py-2 ps-5 d-flex align-items-center <?= $isSubItemActive ? 'text-primary fw-bold' : 'text-muted' ?>" style="font-size: 0.85rem;">
-                                                <i class="bi bi-<?= $subIcon ?> me-3 fs-6"></i>
-                                                <?= $subLabel ?>
-                                            </a>
-                                        <?php endforeach; ?>
-                                    </div>
-                                <?php endif; ?>
-                            <?php
+                            <a href="<?= BASE_URL . $subRoute ?>"
+                                class="list-group-item list-group-item-action border-0 py-2 ps-5 d-flex align-items-center <?= $isSubItemActive ? 'text-primary fw-bold' : 'text-muted' ?>"
+                                style="font-size: 0.85rem;">
+                                <i class="bi bi-<?= $subIcon ?> me-3 fs-6"></i>
+                                <?= $subLabel ?>
+                            </a>
+                            <?php endforeach; ?>
+                        </div>
+                        <?php endif; ?>
+                        <?php
                             endforeach;
                         else:
                             ?>
-                            <div class="p-4 text-center text-muted">
-                                <small>No se pudo cargar el menú dinámico.</small>
-                            </div>
+                        <div class="p-4 text-center text-muted">
+                            <small>No se pudo cargar el menú dinámico.</small>
+                        </div>
                         <?php endif; ?>
                     </div>
 
@@ -252,6 +256,6 @@ include __DIR__ . '/../partials/layouts/navbar.php';
 <script src="<?= BASE_URL; ?>assets/js/ajax/warehouses.js"></script>
 
 <script>
-    const CAN_EDIT = <?= $canEdit ? 'true' : 'false' ?>;
-    const CAN_DELETE = <?= $canDelete ? 'true' : 'false' ?>;
+const CAN_EDIT = <?= $canEdit ? 'true' : 'false' ?>;
+const CAN_DELETE = <?= $canDelete ? 'true' : 'false' ?>;
 </script>

@@ -35,7 +35,7 @@ define('DB_USER','marco'); // Tu usuario de Docker
 define('DB_PASS','3298'); // Tu contraseña de Docker
 
 // **Configuración de la sesión**
-define('APP_SESSION_NAME','sistema003_session'); 
+define('APP_SESSION_NAME','sistema003_session');
 // Define el nombre de la cookie de sesión, usado para evitar colisiones con otras aplicaciones en el mismo servidor.
 
 define('APP_SESSION_TIME','36000'); // 10 horas (36000 segundos) 

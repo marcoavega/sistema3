@@ -1,5 +1,6 @@
 // assets/js/ajax/warehouses.js
 document.addEventListener("DOMContentLoaded", function () {
+  
   const tbody = document.getElementById("warehouses-tbody");
   const API_URL = `${BASE_URL}api/warehouses.php`;
 
@@ -70,15 +71,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
       tr.innerHTML = `
                 <td class="px-4 fw-bold text-muted small">#${escapeHtml(
-                  row.id
-                )}</td>
+        row.id
+      )}</td>
                 <td class="fw-semibold text-body">${escapeHtml(row.name)}</td>
                 <td class="text-center">
                     <div class="d-flex justify-content-center gap-2">
-                        ${
-                          actionsHtml ||
-                          '<span class="text-muted small">Sin acciones</span>'
-                        }
+                        ${actionsHtml ||
+        '<span class="text-muted small">Sin acciones</span>'
+        }
                     </div>
                 </td>
             `;
@@ -332,8 +332,8 @@ document.addEventListener("DOMContentLoaded", function () {
       window.jspdf && window.jspdf.jsPDF
         ? window.jspdf.jsPDF
         : window.jsPDF
-        ? window.jsPDF
-        : null;
+          ? window.jsPDF
+          : null;
     if (!jsPDFlib) {
       showToast("jsPDF no está disponible. Instala jsPDF + autotable.", true);
       return;
@@ -388,27 +388,27 @@ document.addEventListener("DOMContentLoaded", function () {
   const exportPDFBtn = document.getElementById("exportPDFBtn");
   if (exportPDFBtn) exportPDFBtn.addEventListener("click", exportPDF);
 
-// ============================
-// BUSCADOR (igual que products)
-// ============================
-const searchInput = document.getElementById('table-search');
+  // ============================
+  // BUSCADOR (igual que products)
+  // ============================
+  const searchInput = document.getElementById('table-search');
 
-if (searchInput) {
+  if (searchInput) {
     searchInput.addEventListener('input', function () {
-        const term = this.value.toLowerCase().trim();
+      const term = this.value.toLowerCase().trim();
 
-        if (!term) {
-            filteredWarehouses = [...currentWarehouses];
-        } else {
-            filteredWarehouses = currentWarehouses.filter(w =>
-                String(w.id).includes(term) ||
-                (w.name && w.name.toLowerCase().includes(term))
-            );
-        }
+      if (!term) {
+        filteredWarehouses = [...currentWarehouses];
+      } else {
+        filteredWarehouses = currentWarehouses.filter(w =>
+          String(w.id).includes(term) ||
+          (w.name && w.name.toLowerCase().includes(term))
+        );
+      }
 
-        renderRows(filteredWarehouses);
+      renderRows(filteredWarehouses);
     });
-}
+  }
 
 
   // carga inicial
